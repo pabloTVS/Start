@@ -42,11 +42,11 @@ export class CustomersListComponent implements AfterViewInit, OnInit, OnDestroy 
     private authSvc: AuthService) { }
 
   ngOnInit(): void {
-    this.spinner();
+    this.spinnerSvc.show();
     console.log(this.codCom);
     this.custSvc.getAll(this.codCom,this.role).subscribe((customers) =>{
       this.DSCustomer.data= customers;
-      this.spinner();
+      this.spinnerSvc.hide();
     })
   }
   
