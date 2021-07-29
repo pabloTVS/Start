@@ -43,7 +43,6 @@ export class CustomersListComponent implements AfterViewInit, OnInit, OnDestroy 
 
   ngOnInit(): void {
     this.spinnerSvc.show();
-    console.log(this.codCom);
     this.custSvc.getAll(this.codCom,this.role).subscribe((customers) =>{
       this.DSCustomer.data= customers;
       this.spinnerSvc.hide();

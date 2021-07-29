@@ -17,8 +17,6 @@ export class CustomersInterceptor implements HttpInterceptor {
    
     if (req.url.includes('cust')) {
       const userValue = this.authSvc.userValue;
-      console.log(userValue);
-
       const authReq = req.clone({
         setHeaders: {auth: userValue.token},        
       });

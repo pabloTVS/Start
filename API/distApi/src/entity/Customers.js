@@ -64,7 +64,7 @@ var Customers = /** @class */ (function () {
     ], Customers.prototype, "CodFormaPago", void 0);
     __decorate([
         typeorm_1.Column(),
-        __metadata("design:type", Boolean)
+        __metadata("design:type", Number)
     ], Customers.prototype, "RE", void 0);
     __decorate([
         typeorm_1.Column(),
