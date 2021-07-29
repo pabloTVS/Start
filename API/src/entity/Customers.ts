@@ -15,7 +15,7 @@ export class Customers {
     @Column() Fax1: string;
     @Column() Movil1: string;
     @Column() CodFormaPago: number;
-    @Column() RE: boolean;
+    @Column() RE: number;
     @Column() DtoPP: number;
     @Column() DtoComercial: number;
     @Column() CodPostal: string;

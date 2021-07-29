@@ -12,7 +12,10 @@ export interface statesCustomers {
   value: number;
   viewValue: string;
 }
-
+export interface recEqui {
+  value: number;
+  viewValue: string;
+}
 //temporal
 export interface commercial {
   value: number;
@@ -36,12 +39,18 @@ export class CustomerComponent implements OnInit {
 
   selectedState: number;
   selectedCommercial: number;
+  selectedRec: number;
   
 
   stateCustomer: statesCustomers [] = [
     {value: 1, viewValue: 'Correcto'},
     {value: 2, viewValue: 'En riesgo'},
     {value: 3, viewValue: 'Moroso'}
+  ]
+
+  recargo: recEqui [] = [
+    {value: 0, viewValue: 'No'},
+    {value: 1, viewValue: 'Sí'}
   ]
 
   commercial: commercial [] = [
@@ -80,7 +89,8 @@ export class CustomerComponent implements OnInit {
                 Cuenta: ['',[Validators.maxLength(10),Validators.pattern('^[0-9]+$')]],
                 Observaciones: [''],
                 CodComercial: [0, [Validators.required,Validators.pattern('^[0-9]+$')]],
-                EstadoCliente: [1, [Validators.required,Validators.pattern('^[0-9]+$')]]
+                EstadoCliente: [1, [Validators.required,Validators.pattern('^[0-9]+$')]],
+                RE: [0,[Validators.required,Validators.pattern('^[0-9]+$')]]
 
                // IBAN: ['',[Validators.maxLength(23),Validators.pattern('^[A-Z0-9]+$')]]
               })
@@ -115,7 +125,8 @@ export class CustomerComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    try {
+    try 
+    {
       this.route.queryParams.subscribe(params => {
         // Defaults to 0 if no query param provided.
         this.custId = +params['Id'] || 0;
@@ -129,13 +140,18 @@ export class CustomerComponent implements OnInit {
            this.selectedPayment = cust.CodFormaPago;
            this.selectedCommercial = cust.CodComercial;
            this.selectedState = cust.EstadoCliente;
+           this.selectedRec = cust.RE;
          })
 
          this.paymSvc.getAll().subscribe(paym =>{
            this.payments = paym;
          })
       }
-      else this.newCustomer = true;
+      else {
+            this.newCustomer = true;
+            this.paymSvc.getAll().subscribe(paym =>{
+            this.payments = paym;})
+          }
     } catch (e) {
       console.log(e.message);
     }

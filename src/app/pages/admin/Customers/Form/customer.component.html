@@ -65,7 +65,7 @@
                   </span>
                 </div>
               </mat-form-field>
-              <mat-form-field class="inputMedium" appearance="fill"  [ngStyle]="{'background-color': selectedState === 1 ? 'green' : (selectedState === 2 ? 'orange' : 'orangered') }">
+              <mat-form-field class="inputMedium" appearance="fill"  [ngStyle]="{'background-color': selectedState === 1 ? 'green' : (selectedState === 2 ? 'orange' :(selectedState === 3 ? 'orangered':'')) }">
                 <mat-label>Estado del cliente</mat-label>
                 <mat-select formControlName="EstadoCliente" placeholder="Situación del cliente" [(value)]="selectedState">
                   <mat-option *ngFor="let stat of stateCustomer" [value]="stat.value">
@@ -258,6 +258,14 @@
                 </mat-option>
               </mat-select>
             </mat-form-field>
+            <mat-form-field class="inputMedium" appearance="fill">
+              <mat-label>Rec. IVA</mat-label>
+              <mat-select formControlName="RE" placeholder="Recargo de equivalencia IVA" [(value)]="selectedRec">
+                <mat-option *ngFor="let rec of recargo" [value]="rec.value">
+                  {{rec.viewValue}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
             <mat-form-field class="inputSmall" appearance="fill">
               <mat-label>Dto. pronto pago</mat-label>
               <input matInput
@@ -420,4 +428,4 @@
     InValid:
     {{ customersForm.invalid }}
   </pre>
- -->  
+-->   
