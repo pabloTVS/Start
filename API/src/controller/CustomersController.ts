@@ -9,7 +9,7 @@ export class CustomerController {
         const {CodComercial,Role} = req.params;
         const customerRepository = getRepository(Customers);
         
-        if (CodComercial === 'null' || Role === 'Admin') //no hay comercial.
+        if (Role === 'Admin') //Si eres Admin lo muestra siempre.
         {
           let customer:any;
           try {
@@ -173,10 +173,15 @@ export class CustomerController {
       }
 
       // Remove customer
-      customerRepository.delete(IdCliente);
+      try {
+        await customerRepository.delete(IdCliente);        
+      } catch (e) {
+        return res.status(409).json(e.message);
+      }
+
       res.status(201).json({ message: ' Cliente borrado' });
     };
-  static comer: string;
+  
 }
 
 export default CustomerController;
