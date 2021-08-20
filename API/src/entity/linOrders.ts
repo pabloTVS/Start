@@ -1,8 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Unique, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Unique, Column, Generated } from 'typeorm';
 @Entity()
 @Unique(['IdLinPed'])
 export class linorders {
-    @PrimaryGeneratedColumn() IdLinPed: number;
+    @PrimaryGeneratedColumn()
+    @Generated("increment")
+     IdLinPed: number;
     @Column("int") NumPed: number;
     @Column("bigint") CodArticulo: number;
     @Column("decimal",{precision:18.5}) PCosto: number;
@@ -12,6 +14,7 @@ export class linorders {
     @Column("decimal",{precision:18.5}) SubTotal: number;
     @Column("decimal",{precision:18.2}) DtoC: number;
     @Column("decimal",{precision:18.5}) ImporteDtoC: number;
+    @Column("decimal",{precision:18.2}) DtoPP: number;
     @Column("decimal",{precision:18.5}) BaseImponible: number;
     @Column("decimal",{precision:18.2}) IVA: number;
     @Column("decimal",{precision:18.5}) ImporteIVA: number;

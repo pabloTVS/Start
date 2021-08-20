@@ -21,6 +21,6 @@ routes.use('/supp', supp);
 routes.use('/categ',categ);
 routes.use('/subcat',subcat);
 routes.use('/orders',orders);
-routes.use('/ordersLines',linorders)
+routes.use('/ordlines',linorders)
 
 export default routes;
