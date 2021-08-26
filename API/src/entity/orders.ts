@@ -19,6 +19,7 @@ export class Orders {
     @Column("decimal",{precision:18.2}) Comision: number;
     @Column("int") CodDestino: number;
     @Column("tinyint",{default:1}) CodOrdStatus: number;
+    @Column("int",{default:1}) CodFormaPago: number;
 }
 
  

@@ -1,6 +1,8 @@
 <div class="table-button-row">
   <a mat-flat-button color="primary" routerLink="/clientes/Form" [queryParams]="{Id: 0}">Añadir nuevo cliente</a>  
-</div><mat-form-field>
+</div>
+
+<mat-form-field>
     <mat-label>Búsqueda</mat-label>
     <input matInput (keyup)="applyFilter($event)" placeholder="Dígite el texto a buscar" #input>
 </mat-form-field>

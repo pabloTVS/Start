@@ -2,20 +2,25 @@ import { getRepository } from 'typeorm';
 import { Request, Response, text } from 'express';
 import { validate } from 'class-validator';
 
-import { Orders } from '../entity/orders'
-
+import { Orders } from '../entity/orders';
+import { vieworders } from '../entity/viewOrders';
 
 export class OrdersController {
     //obtiene las cabeceras.
     static getAllOrders = async (req: Request, res: Response) => {
         const {CodComercial,Role} = req.params;
-        const ordersRepository = getRepository(Orders);
+        const ordersRepository = getRepository(vieworders);
   
         if (Role === 'Admin') //Si eres Admin lo muestra siempre.
         {
             let orders:any;
             try {
-            orders = await ordersRepository.find();
+              orders = await ordersRepository.createQueryBuilder().
+              select(["ord.NumPed","ord.Serie","ord.Fecha","ord.FechaEntrega","ord.CodComercial","ord.Comercial","ord.CodCli","ord.NombreCliente","ord.DenominacionComercial","ord.Destino","ord.Direccion",
+              "ord.Localidad","ord.CodPostal","ord.Provincia","ord.Total","ord.Pagado","ord.Pendiente","ord.CodFormaPago","ord.DescripcionFormaPago","ord.CodigoEstado","ord.Estado",
+              "ord.PorcComision","ord.SerieFra","ord.NumFra","ord.FechaFra","ord.CodDestino","ord.CodDestino","ord.DtoPP","ord.Observaciones"]).
+              from(vieworders,"ord").where("ord.NumPed != 0").orderBy("ord.Fecha","DESC").getMany();
+//              orders = await ordersRepository.find();
                 res.send(orders);
     
             } catch (e) {
@@ -24,13 +29,14 @@ export class OrdersController {
     
         }   
         else {
-            let orders : Orders[];
+            let orders : vieworders[];
                 
             try {
             orders = await ordersRepository.createQueryBuilder().
-            select(["ord.NumPed","ord.Serie","ord.Fecha","ord.FechaEntrega","ord.CodCli","ord.DtoPP","ord.Observaciones","ord.TotalPedido",
-            "ord.TotalPagado","ord.TotalPendiente","ord.NumFra","ord.SerieFra","ord.FechaFra","ord.CodComercial","ord.Comision","ord.CodDestino","ord.CodOrdStatus"]).
-            from(Orders,"ord").where("ord.CodComercial =:com ",{com: CodComercial}).getMany();
+            select(["ord.NumPed","ord.Serie","ord.Fecha","ord.FechaEntrega","ord.CodComercial","ord.Comercial","ord.CodCli","ord.NombreCliente","ord.DenominacionComercial","ord.Destino","ord.Direccion",
+            "ord.Localidad","ord.CodPostal","ord.Provincia","ord.Total","ord.Pagado","ord.Pendiente","ord.CodFormaPago","ord.DescripcionFormaPago","ord.CodigoEstado","ord.Estado",
+            "ord.PorcComision","ord.SerieFra","ord.NumFra","ord.FechaFra","ord.CodDestino","ord.CodDestino","ord.DtoPP","ord.Observaciones"]).
+            from(vieworders,"ord").where("ord.CodComercial =:com ",{com: CodComercial}).getMany();
 
             orders ? res.send(orders) :  res.status(404).json({ message: 'No se ha devuelto ningún valor.' });
             }
@@ -48,7 +54,7 @@ export class OrdersController {
         try {
         orders = await orderRepository.createQueryBuilder().
         select(["ord.NumPed","ord.Serie","ord.Fecha","ord.FechaEntrega","ord.CodCli","ord.DtoPP","ord.Observaciones","ord.TotalPedido",
-        "ord.TotalPagado","ord.TotalPendiente","ord.NumFra","ord.SerieFra","ord.FechaFra","ord.CodComercial","ord.Comision","ord.CodDestino","ord.CodOrdStatus"]).
+        "ord.TotalPagado","ord.TotalPendiente","ord.NumFra","ord.SerieFra","ord.FechaFra","ord.CodComercial","ord.Comision","ord.CodDestino","ord.CodOrdStatus","ord.CodFormaPago"]).
         from(Orders,"ord").where("ord.NumPed =:ped ",{ped: NumPedido}).getMany();
 
         orders ? res.send(orders) :  res.status(404).json({ message: 'No se ha devuelto ningún valor.' });
@@ -59,7 +65,7 @@ export class OrdersController {
   }
   //New order
   static new = async (req: Request, res: Response) => {
-    const {Serie,Fecha,FechaEntrega,CodCli,DtoPP,Observaciones,CodComercial,Comision,CodDestino,CodOrdStatus} = req.body;
+    const {Serie,Fecha,FechaEntrega,CodCli,DtoPP,Observaciones,CodComercial,Comision,CodDestino,CodOrdStatus,CodFormaPago} = req.body;
     const order = new Orders();
 
     order.Serie = Serie;
@@ -72,7 +78,7 @@ export class OrdersController {
     order.Comision = Comision;
     order.CodDestino = CodDestino;
     order.CodOrdStatus = CodOrdStatus;
-
+    order.CodFormaPago = CodFormaPago;
     //ejecuto validaciones..
     const validationOpt = { validationError: { target: false, value: false } };
     const errors = await validate(order, validationOpt) ;
