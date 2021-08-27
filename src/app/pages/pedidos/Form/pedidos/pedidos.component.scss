@@ -1,0 +1,42 @@
+.mat-card-content {
+    display: flex;
+    flex-direction: row;
+    align-items: left;
+    .form-field-label {
+      white-space: nowrap;
+    }
+  }  
+  .button{
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+  }
+  
+  .mat-card{
+    margin-top: 15px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 18px;
+    box-shadow: none;
+  }
+  .textarea-full-width {
+    width : 400px;
+  }
+  .mat-card .mat-form-field + .mat-form-field {
+    margin-left: 8px;
+  }
+  
+  //errors
+  .inputBig{
+    width: 400px;
+  }
+  .inputSmall{
+    width: 150px;
+  }
+  .inputVerySmall{
+    width: 100px;
+  }
+  .span-errors{
+    font-size: 10px;
+    color:red;
+  }

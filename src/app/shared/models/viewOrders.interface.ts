@@ -1,4 +1,4 @@
-export interface viewOrders{
+export interface ViewOrders{
     NumPed: number;
     Serie: string;
     Fecha: string;
