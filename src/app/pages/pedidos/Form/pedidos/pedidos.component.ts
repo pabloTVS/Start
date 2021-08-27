@@ -11,6 +11,7 @@ import { Orders } from '@shared/models/orders.interface'
 import { LinesOrders } from '@shared/models/linesOrders.interface';
 import { Customer } from '@app/shared/models/customer.interface';
 import { Payments } from '@shared/models/payments.interface';
+import { filter } from 'rxjs/operators';
 
 export interface orderStatus {
   value: string;
@@ -54,6 +55,7 @@ export class PedidosComponent implements OnInit {
   selectedPayment: number;
   selectedCodCli: number;
   selectedDtoPP: number;
+  selectedDtoComercial: number;
   selectedSerie: string;
 
   constructor(
@@ -72,18 +74,16 @@ export class PedidosComponent implements OnInit {
 
   orderForm = this.fb.group({
       Serie: ['A',[Validators.required]],
-      Fecha: [Date(),[Validators.required]],
-      FechaEntrega: [Date()+5,[Validators.required]],
       CodCli: ['',[Validators.required]],
       DtoPP: [0,[Validators.min(0),Validators.max(100),Validators.required,Validators.pattern('^[0-9.]+$')]],
-      CodFormaPago: [1,[Validators.required,Validators.pattern('^[0-9]+$')]],
+      DtoComercial: [0,[Validators.min(0),Validators.max(100),Validators.required,Validators.pattern('^[0-9.]+$')]],
+      CodFormaPago: [,[Validators.required,Validators.pattern('^[0-9]+$')]],
       CodComercial: [0, [Validators.required,Validators.pattern('^[0-9]+$')]],
       CodOrdStatus: [1,[Validators.required,Validators.pattern('^[0-1]+$')]],
       CodDestino: [0, [Validators.required,Validators.pattern('^[0-9]+$')]],
       Observaciones: ['']
   });
   
-
   ngOnInit(): void {
     if (!this.codCli)
       this.svcCustomer.getAll(this.codCom,this.role).subscribe(cust => {this.customer = cust;});
@@ -102,5 +102,19 @@ export class PedidosComponent implements OnInit {
   onSubmitHead():void {
     console.log('se ha grabado la cabecera');
     
+  }
+  onChangeCustomer(event:any){
+    for(let i=0; i < this.customer.length;i++)
+    {
+      if (this.customer[i].IdCliente === event.value)
+      {
+        this.orderForm.patchValue({
+          DtoPP: this.customer[i].DtoPP,
+          CodFormaPago: this.customer[i].CodFormaPago,
+          CodComercial: this.customer[i].CodComercial,
+          DtoComercial: this.customer[i].DtoComercial
+        })
+      }  
+    }
   }
 }

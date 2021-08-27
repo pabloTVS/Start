@@ -11,24 +11,6 @@
         <mat-card>
             <mat-card-content>
                 <section>
-                    <mat-form-field class="inputBig" hintLabel="Max. 20 caracteres" appearance="fill">
-                        <mat-label>Fecha</mat-label>
-                        <input type="datetime" formControlName="Fecha" matInput #input1 [ngClass]="{'is-invalid': isValidField('Fecha')}">
-                            <div class="invalid-feedback">
-                            <span class="span-errors" *ngIf="orderForm.get('Fecha').errors?.required">
-                                Fecha obligatoria.
-                            </span>
-                            </div>
-                    </mat-form-field>
-                    <mat-form-field class="inputBig" hintLabel="Max. 20 caracteres" appearance="fill">
-                        <mat-label>Fecha de entrega</mat-label>
-                        <input type="datetime" formControlName="FechaEntrega" matInput #input1 [ngClass]="{'is-invalid': isValidField('FechaEntrega')}">
-                            <div class="invalid-feedback">
-                            <span class="span-errors" *ngIf="orderForm.get('FechaEntrega').errors?.required">
-                                Fecha obligatoria.
-                            </span>
-                            </div>
-                    </mat-form-field>
                     <mat-form-field class="inputSmall" appearance="fill"  >
                         <mat-label>Serie</mat-label>
                         <mat-select formControlName="Serie" placeholder="Selecciona una serie" [(value)]="selectedSerie">
@@ -39,13 +21,19 @@
                     </mat-form-field>
                     <mat-form-field class="inputBig" *ngIf = "customer" appearance="fill"  >
                         <mat-label>Cliente</mat-label>
-                        <mat-select formControlName="CodCli" placeholder="Selecciona un cliente" [(value)]="selectedCodCli">
+                        <mat-select formControlName="CodCli" (selectionChange)="onChangeCustomer($event)" placeholder="Selecciona un cliente" [(value)]="selectedCodCli">
                           <mat-option *ngFor="let item of customer" [value]="item.IdCliente">
                             {{item.Nombre}}
                           </mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <mat-form-field class="inputBig" *ngIf = "payments" appearance="fill"  >
+                    <mat-form-field class="inputSmall" appearance="fill">
+                        <mat-label>Dto. pronto pago</mat-label>
+                        <input matInput
+                          formControlName="DtoPP" type="number" min=0 max=100 step=0.01>
+                    </mat-form-field>
+        
+                    <mat-form-field class="inputMedium" *ngIf = "payments" appearance="fill"  >
                         <mat-label>Forma de pago</mat-label>
                         <mat-select formControlName="CodFormaPago" placeholder="Selecciona una forma de pago" [(value)]="selectedPayment">
                           <mat-option *ngFor="let pay of payments" [value]="pay.IdFormaPago">
