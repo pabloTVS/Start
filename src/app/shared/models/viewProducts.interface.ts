@@ -3,7 +3,7 @@ export interface viewProducts {
     Articulo: string;
     Sku: string;
     Precio: string;
-    PrecioRebajado: string;
+    precioRebajado: string;
     IVA: string;
     Stock: string;
     det_Imagen: string;

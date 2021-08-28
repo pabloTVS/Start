@@ -40,7 +40,7 @@ export class CustomerComponent implements OnInit {
   selectedState: number;
   selectedCommercial: number;
   selectedRec: number;
-  
+
 
   stateCustomer: statesCustomers [] = [
     {value: 1, viewValue: 'Correcto'},
@@ -62,8 +62,9 @@ export class CustomerComponent implements OnInit {
   constructor(private custSvc: CustomersService,
               private paymSvc: PaymentsService,
               private route: ActivatedRoute,
-              private fb: FormBuilder) { }
-  
+              private fb: FormBuilder
+              ) { }
+
 
 
               customersForm = this.fb.group({
@@ -91,7 +92,6 @@ export class CustomerComponent implements OnInit {
                 CodComercial: [0, [Validators.required,Validators.pattern('^[0-9]+$')]],
                 EstadoCliente: [1, [Validators.required,Validators.pattern('^[0-9]+$')]],
                 RE: [0,[Validators.required,Validators.pattern('^[0-9]+$')]]
-
                // IBAN: ['',[Validators.maxLength(23),Validators.pattern('^[A-Z0-9]+$')]]
               })
 
@@ -125,7 +125,7 @@ export class CustomerComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    try 
+    try
     {
       this.route.queryParams.subscribe(params => {
         // Defaults to 0 if no query param provided.

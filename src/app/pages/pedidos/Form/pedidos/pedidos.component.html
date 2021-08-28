@@ -3,10 +3,10 @@
 </mat-card>
 
 <ng-container>
-    <form       
+    <form
     class="needs-validation"
     novalidate
-    [formGroup]="orderForm"
+    [formGroup]="headForm"
     (ngSubmit)="onSubmitHead()">
         <mat-card>
             <mat-card-content>
@@ -30,13 +30,13 @@
                     <mat-form-field class="inputSmall" appearance="fill">
                         <mat-label>Dto. pronto pago</mat-label>
                         <input matInput
-                          formControlName="DtoPP" type="number" min=0 max=100 step=0.01>
+                          formControlName="DtoPP" type="number" min=0 max=100 step=0.01 ng-readonly="true">
                     </mat-form-field>
-        
-                    <mat-form-field class="inputMedium" *ngIf = "payments" appearance="fill"  >
+
+                    <mat-form-field class="inputMedium" *ngIf = "payments$" appearance="fill"  >
                         <mat-label>Forma de pago</mat-label>
                         <mat-select formControlName="CodFormaPago" placeholder="Selecciona una forma de pago" [(value)]="selectedPayment">
-                          <mat-option *ngFor="let pay of payments" [value]="pay.IdFormaPago">
+                          <mat-option *ngFor="let pay of payments$ | async" [value]="pay.IdFormaPago">
                             {{pay.Nombre}}
                           </mat-option>
                         </mat-select>
@@ -45,4 +45,103 @@
             </mat-card-content>
         </mat-card>
     </form>
+</ng-container>
+<ng-container class="articulos" *ngIf="selectedCodCli && product">
+  <mat-card>
+      <mat-card-header>
+          <mat-card-header>Seleccione un atículo y pulse añadir.</mat-card-header>
+          <br>
+         <!-- <mat-card-subtitle></mat-card-subtitle>-->
+      </mat-card-header>
+    <!--    <img matCardImage src="Card wide image source"> -->
+      <mat-card-content>
+          <form
+          class="needs-validation"
+          novalidate
+          [formGroup]="artForm">
+          <mat-form-field class="inputMedium" *ngIf = "product" appearance="fill">
+            <mat-label>Artículo</mat-label>
+            <mat-select formControlName="CodArt" (selectionChange)="onChangeArt($event)" placeholder="Selecciona un artículo" [(value)]="selectedCodArt">
+              <mat-option *ngFor="let art of product" [value]="art.ID">
+                {{art.ID}}
+              </mat-option>
+            </mat-select>
+        </mat-form-field>
+
+          <mat-form-field class="inputBig" hintLabel="Max. 150 caracteres" appearance="fill">
+            <mat-label>Descripcion</mat-label>
+            <input formControlName="Descripcion" matInput #input1 maxlength="150" [ngClass]="{'is-invalid': isValidFieldArt('Descripcion')}">
+            <mat-hint align="end">{{input1.value?.length || 0}}/150</mat-hint>
+            <div class="invalid-feedback">
+              <span class="span-errors" *ngIf="artForm.get('Descripcion').errors?.required">
+                  El nombre es obligatorio.
+              </span>
+              <span class="span-errors" *ngIf="artForm.get('Descripcion').errors?.minlength">
+                Longitud mínima es de
+                {{ customersForm.get("Url").errors?.minlength?.requiredLength }}
+                caracteres.
+              </span>
+              <span class="span-errors" *ngIf="artForm.get('Descripcion').errors?.pattern">
+                Caracteres no válidos.
+              </span>
+            </div>
+          </mat-form-field>
+          <mat-form-field class="inputSmall" appearance="fill">
+            <mat-label>Cantidad</mat-label>
+            <input formControlName="Cantidad" matInput [ngClass]="{'is-invalid': isValidFieldArt('Cantidad')}">
+            <div class="invalid-feedback">
+              <span class="span-errors" *ngIf="artForm.get('Cantidad').errors?.required">
+                El nombre es obligatorio.
+              </span>
+              <span class="span-errors" *ngIf="artForm.get('Cantidad').errors?.pattern">
+                Caracteres no válidos.
+              </span>
+            </div>
+          </mat-form-field>
+          <mat-form-field class="inputSmall" appearance="fill">
+            <mat-label>Precio</mat-label>
+            <input formControlName="Precio" matInput [ngClass]="{'is-invalid': isValidFieldArt('Precio')}">
+            <div class="invalid-feedback">
+              <span class="span-errors" *ngIf="artForm.get('Precio').errors?.required">
+                El nombre es obligatorio.
+              </span>
+              <span class="span-errors" *ngIf="artForm.get('Precio').errors?.pattern">
+                Caracteres no válidos.
+              </span>
+            </div>
+          </mat-form-field>
+          <mat-form-field class="inputSmall" appearance="fill">
+            <mat-label>Dto. comercial</mat-label>
+            <input matInput
+              formControlName="DtoComercial"
+              type="number"
+              min=0 max=100 step=0.01
+              [ngClass]="{'is-invalid': isValidFieldArt('DtoComercial')}"
+              [(value)]="selectedDtoComercial"
+              >
+              <div class="invalid-feedback">
+                <span class="span-errors" *ngIf="artForm.get('DtoComercial').errors?.required">
+                  Dto. comercial es obligatorio.
+                </span>
+                <span class="span-errors" *ngIf="artForm.get('DtoComercial').errors?.pattern">
+                  Caracteres no válidos.
+                </span>
+                <span class="span-errors" *ngIf="artForm.get('DtoComercial').errors?.min">
+                  Valor mínimo permitido 0.
+                </span>
+                <span class="span-errors" *ngIf="artForm.get('DtoComercial').errors?.max">
+                  Valor máximo permitido 100.
+                </span>
+              </div>
+          </mat-form-field>
+          <button mat-button color="primary" (click)="onAddArt">Añadir</button>
+        </form>
+      </mat-card-content>
+<!--      <mat-card-actions align="medium">
+         <button mat-button color="primary" (click)="onAddArt">Añadir</button>
+      </mat-card-actions>
+      <mat-card-footer>
+          Footer
+      </mat-card-footer>-->
+  </mat-card>
 </ng-container>
