@@ -5,13 +5,13 @@
     .form-field-label {
       white-space: nowrap;
     }
-  }  
+  }
   .button{
     display: flex;
     flex-direction: row-reverse;
     align-items: center;
   }
-  
+
   .mat-card{
     margin-top: 15px;
     margin-left: 10px;
@@ -25,7 +25,7 @@
   .mat-card .mat-form-field + .mat-form-field {
     margin-left: 8px;
   }
-  
+
   //errors
   .inputBig{
     width: 400px;
@@ -39,4 +39,32 @@
   .span-errors{
     font-size: 10px;
     color:red;
+  }
+
+  table {
+    width: 98%;
+    margin: 0 auto;
+    margin-top: 1rem;
+  }
+
+  th.mat-sort-header-sorted {
+    color: black;
+  }
+
+  .table-button-row button {
+    margin: 12px;
+  }
+
+  .btn-new {
+    width: 20%;
+  }
+
+  .mat-header-cell {
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .mat-cell {
+    text-align: center;
+    justify-content:center;
   }

@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
+import { MatSort} from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
 
 import { OrdersService } from '@pages/pedidos/services/orders.service';
 import { CustomersService } from '@pages/admin/services/customers.service';
@@ -31,6 +34,11 @@ export interface orderSerie {
   styleUrls: ['./pedidos.component.scss']
 })
 export class PedidosComponent implements OnInit {
+  displayedColumns: string[] = ['Imagen', 'Articulo', 'Sku','precio','PrecioRebajado','actions'];
+  dataSource = new MatTableDataSource();
+
+  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   status: orderStatus[] =
   [
@@ -107,10 +115,28 @@ export class PedidosComponent implements OnInit {
       this.selectedCodCli = this.codCli;
 
     this.payments$ = this.svcPay.getAll();
-    this.svcProd.getAllProducts().subscribe( prod => { this.product=prod;console.log(this.product);
+    this.svcProd.getAllProducts().subscribe( prod => {
+      this.product=prod;
+      this.dataSource.data=prod;
+      console.log(this.product);
     });
 
     //this.svcPay.getAll().subscribe(paym =>{this.payments = paym;});
+  }
+
+  ngAfterViewInit() {
+    //this.spinnerSvc.hide();
+    this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
+  }
+
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
   }
 
   isValidField(name: string): boolean {
@@ -156,7 +182,7 @@ export class PedidosComponent implements OnInit {
         this.svcProd.getById(event.value).subscribe(prod => {
 
           this.selectedProduct = prod;
-          console.log(this.selectedProduct,'precio rebajado: ',this.selectedProduct.precioRebajado);
+//          console.log(this.selectedProduct,'precio rebajado: ',this.selectedProduct.precioRebajado);
 
           this.artForm.patchValue({
             Descripcion : this.selectedProduct.Articulo,
@@ -168,9 +194,19 @@ export class PedidosComponent implements OnInit {
       }
     }
   }
+  onSelectArt (item:any) {
+    console.log(item);
+    this.artForm.patchValue({
+      Descripcion : item.Articulo,
+      Precio : item.PrecioRebajado || 0
+    })
+
+
+  }
+
   onAddArt():void
   {
-    console.log('añade un articulo');
+    console.log('añade un articulo',this.artForm.value);
 
   }
 }
