@@ -6,7 +6,7 @@ import { Router } from 'express';
 const router = Router();
 
 // Get all product and lines.
-router.get('/:CodComercial/:Role',[checkJwt], OrdersController.getAllOrders);
+router.get('/:CodComercial/:CodCli/:Role',[checkJwt], OrdersController.getAllOrders);
 // Get one order
 router.get('/:NumPedido',[checkJwt], OrdersController.getById);
 

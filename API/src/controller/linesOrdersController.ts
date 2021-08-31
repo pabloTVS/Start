@@ -71,7 +71,7 @@ export class LinesOrdersController {
             return res.status(409).json(e.message);  
         }
 
-       // res.status(201).json({message: 'Línea añadida correctamente'});
+        res.status(201).json({message: 'Línea añadida correctamente'});
     };
 
     static delete = async (req: Request, res: Response) => {

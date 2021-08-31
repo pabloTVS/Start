@@ -11,8 +11,7 @@ export interface viewProducts {
     Categoria: string;
     Subcategoria: string;
     Estado: string;
-    Url: string;
-    DescCorta: string;
+    RefProveedor: string;
     IdProveedor: string;
     IdCategoria: string;
     IdSubCategoria: string;

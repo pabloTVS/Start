@@ -1,6 +1,6 @@
 CREATE 
     ALGORITHM = MERGE 
-    DEFINER = `startden_dekorativa`@`213.181.68.23` 
+    DEFINER = `root`@`localhost` 
     SQL SECURITY DEFINER
 VIEW `view_products` AS
     SELECT 

@@ -21,6 +21,7 @@ export class PedidosListComponent implements OnInit {
 //traígo los valores del Observable user.
   userValue = this.authSvc.userValue;
   codCom = this.userValue.commercial;
+  codCli = this.userValue.customer;
   role = this.userValue.role;    
 
   displayedColumns: string[] = ['Estado','NumPed', 'Serie' , 'Fecha', 'FechaEntrega', 'Comercial', 'NombreCliente',
@@ -35,7 +36,7 @@ export class PedidosListComponent implements OnInit {
 
   ngOnInit(): void {
     this.spinnerSvc.show();
-    this.svcOrder.getAllOrders(this.codCom,this.role).subscribe((orders) => {this.dataSource.data = orders;});
+    this.svcOrder.getAllOrders(this.codCom,this.codCli,this.role).subscribe((orders) => {this.dataSource.data = orders;});
     this.spinnerSvc.hide();
   }
 

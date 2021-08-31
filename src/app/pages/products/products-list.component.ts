@@ -12,7 +12,7 @@ import { MatPaginator } from '@angular/material/paginator';
 })
 
 export class ProductsListComponent implements AfterViewInit {
-  displayedColumns: string[] = ['Imagen', 'Articulo', 'Sku', 'Proveedor', 'Categoria', 'Subcategoria','actions'];
+  displayedColumns: string[] = ['Imagen', 'Articulo', 'Sku', 'RefProveedor' , 'Proveedor', 'Categoria', 'Subcategoria','actions'];
   dataSource = new MatTableDataSource();
  
   @ViewChild(MatSort) sort: MatSort;

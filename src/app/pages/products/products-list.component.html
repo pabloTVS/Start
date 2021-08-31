@@ -23,6 +23,11 @@
       <td mat-cell *matCellDef="let element"> {{element.Sku}} </td>
     </ng-container>
 
+    <ng-container matColumnDef="RefProveedor">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Ref. proveedor </th>
+      <td mat-cell *matCellDef="let element"> {{element.RefProveedor}} </td>
+    </ng-container>    
+
     <ng-container matColumnDef="Precio">
       <th mat-header-cell *matHeaderCellDef mat-sort-header> Precio </th>
       <td mat-cell *matCellDef="let element"> {{element.Precio}} </td> 

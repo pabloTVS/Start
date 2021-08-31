@@ -7,10 +7,12 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 
 import { OrdersService } from '@pages/pedidos/services/orders.service';
+import { LineOrdersService } from '@pages/pedidos/services/line-orders.service';
 import { CustomersService } from '@pages/admin/services/customers.service';
 import { PaymentsService} from '@pages/admin/services/payments.service';
 import { AuthService } from '@app/pages/auth/auth.service';
 import { productsService } from '@app/pages/products/services/products.service'
+import { SpinnerOverlayService } from '@shared/services/spinner-overlay.service'
 
 import { Orders } from '@shared/models/orders.interface'
 import { LinesOrders } from '@shared/models/linesOrders.interface';
@@ -34,7 +36,7 @@ export interface orderSerie {
   styleUrls: ['./pedidos.component.scss']
 })
 export class PedidosComponent implements OnInit {
-  displayedColumns: string[] = ['Imagen', 'Articulo', 'Sku','precio','PrecioRebajado','actions'];
+  displayedColumns: string[] = ['Imagen', 'Articulo', 'Sku', 'RefProveedor','Precio','PrecioRebajado','actions'];
   dataSource = new MatTableDataSource();
 
   @ViewChild(MatSort) sort: MatSort;
@@ -60,7 +62,7 @@ export class PedidosComponent implements OnInit {
   selectedProduct: viewProducts;
 
   orderId: number;
-  createHead: boolean;
+  createHead: boolean = false;
 
   selectedCodArt: number;
   selectedState: number;
@@ -72,13 +74,14 @@ export class PedidosComponent implements OnInit {
   selectedSerie: string;
 
   constructor(
-    private route: ActivatedRoute,
     private fb: FormBuilder,
     private svcOrders: OrdersService,
+    private svdLinOrd: LineOrdersService,
     private svcCustomer: CustomersService,
     private svcPay: PaymentsService,
     private svcProd: productsService,
-    private authSvc: AuthService) { }
+    private authSvc: AuthService,
+    private spinnerSvc: SpinnerOverlayService) { }
 
   //traígo los valores del Observable user.
   userValue = this.authSvc.userValue;
@@ -99,16 +102,20 @@ export class PedidosComponent implements OnInit {
   });
 
   artForm = this.fb.group({
-    CodArt: [''],
-    Descripcion: [' ',[Validators.required]],
-    Cantidad: [1,[Validators.required,Validators.pattern('^[0-9.]+$')]],
+    NumPed: [],
+    CodArticulo:[],
+    PCosto:[],
+    Descripcion: ['',[Validators.required]],
+    Cantidad: [1,[Validators.required,Validators.min(0),Validators.pattern('^[0-9.]+$')]],
     Precio: [0,[Validators.required,Validators.pattern('^[A-Z0-9.]+$')]],
-    DtoComercial: [0,[Validators.min(0),Validators.max(100),Validators.required,Validators.pattern('^[0-9.]+$')]],
-    DtoPP: [0,[Validators.min(0),Validators.max(100),Validators.required,Validators.pattern('^[0-9.]+$')]]
+    DtoC: [0,[Validators.min(0),Validators.max(100),Validators.required,Validators.pattern('^[0-9.]+$')]],
+    DtoPP: [0,[Validators.min(0),Validators.max(100),Validators.required,Validators.pattern('^[0-9.]+$')]],
+    IVA:[],
+    RE: [0]
   });
 
   ngOnInit(): void {
-
+    this.spinner();
     if (!this.codCli)
       this.svcCustomer.getAll(this.codCom,this.role).subscribe(cust => {this.customer = cust;});
     else
@@ -118,12 +125,15 @@ export class PedidosComponent implements OnInit {
     this.svcProd.getAllProducts().subscribe( prod => {
       this.product=prod;
       this.dataSource.data=prod;
-      console.log(this.product);
+      this.spinner();
+      
     });
-
-    //this.svcPay.getAll().subscribe(paym =>{this.payments = paym;});
   }
 
+  spinner()
+  {
+      this.dataSource.data.length >0 ? this.spinnerSvc.hide() : this.spinnerSvc.show();
+  }
   ngAfterViewInit() {
     //this.spinnerSvc.hide();
     this.dataSource.sort = this.sort;
@@ -144,15 +154,37 @@ export class PedidosComponent implements OnInit {
     this.headForm.get(name).errors
     return fieldName.invalid && fieldName.touched;
   }
+
   isValidFieldArt(name: string): boolean {
     const fieldName = this.artForm.get(name);
     this.artForm.get(name).errors
     return fieldName.invalid && fieldName.touched;
   }
+  
   onSubmitHead():void {
-    console.log('se ha grabado la cabecera');
-
+    if (!this.createHead && 
+      (window.confirm('¿Estás seguro de crear el pedido?.\nYa no podrá modificar los datos posteriormente.')) )
+    {
+      try {
+        this.svcOrders.new(this.headForm.value).subscribe(
+          ord => {
+            console.log('pedido creado: ',ord);
+            
+            this.orderId = ord.NumPed;
+            console.log(this.orderId,ord.NumPed);
+            
+          }
+        );
+        window.alert('Cabecera de pedido creada correctamente.')
+        this.createHead = true;
+        this.headForm.disable(); //desactivo el form.
+      } catch (error) {
+        console.log('Error creando pedido.')
+      }
+    }
+    //console.log('se ha grabado la cabecera',this.headForm.value);
   }
+
   onChangeCustomer(event:any){
 
     for(let i=0; i < this.customer.length;i++)
@@ -166,13 +198,13 @@ export class PedidosComponent implements OnInit {
           DtoComercial: this.customer[i].DtoComercial
         });
         this.artForm.patchValue({
-          DtoComercial: this.customer[i].DtoComercial,
+          DtoC: this.customer[i].DtoComercial,
           DtoPP: this.customer[i].DtoPP
         })
       }
     }
   }
-  onChangeArt(event:any){
+  /*onChangeArt(event:any){
 
     for(let i=0; i < this.product.length;i++)
     {
@@ -185,6 +217,7 @@ export class PedidosComponent implements OnInit {
 //          console.log(this.selectedProduct,'precio rebajado: ',this.selectedProduct.precioRebajado);
 
           this.artForm.patchValue({
+            NumPed: this.orderId,
             Descripcion : this.selectedProduct.Articulo,
             Precio : this.selectedProduct.precioRebajado || 0
           })
@@ -193,11 +226,15 @@ export class PedidosComponent implements OnInit {
 
       }
     }
-  }
+  }*/
   onSelectArt (item:any) {
     console.log(item);
     this.artForm.patchValue({
+      NumPed: this.orderId,
+      CodArticulo: item.ID,
+      PCosto: item.PCoste,
       Descripcion : item.Articulo,
+      IVA: item.IVA,
       Precio : item.PrecioRebajado || 0
     })
 
@@ -207,6 +244,12 @@ export class PedidosComponent implements OnInit {
   onAddArt():void
   {
     console.log('añade un articulo',this.artForm.value);
+    try {
+      this.svdLinOrd.new(this.artForm.value).subscribe();
+      window.alert('Línea creada correctamente.');
+    } catch (error) {
+      console.log('Error creando pedido.')
+    }
 
   }
 }
