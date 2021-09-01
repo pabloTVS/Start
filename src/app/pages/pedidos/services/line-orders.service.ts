@@ -13,7 +13,7 @@ export class LineOrdersService {
 
   constructor(private http: HttpClient) { }
 
-  getAllOrders(NumPed: number): Observable<LinesOrders[]>{
+  getLinOrder(NumPed: number): Observable<LinesOrders[]>{
     return this.http.get<LinesOrders[]>(`${environment.API_URL}/ordlines/${NumPed}`).
     pipe(catchError(this.handlerError));
   }

@@ -36,8 +36,12 @@ export interface orderSerie {
   styleUrls: ['./pedidos.component.scss']
 })
 export class PedidosComponent implements OnInit {
-  displayedColumns: string[] = ['Imagen', 'Articulo', 'Sku', 'RefProveedor','Precio','PrecioRebajado','actions'];
+  displayedColumns: string[] = ['Articulo', 'Sku', 'RefProveedor','Precio','PrecioRebajado','actions'];
   dataSource = new MatTableDataSource();
+
+  displayedColumnsOrder: string[] = ['NumPed', 'CodArticulo', 'Descripcion','Cantidad','Precio','IVA','DtoC','DtoPP'];
+  dataSourceOrder = new MatTableDataSource();
+  
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -59,9 +63,12 @@ export class PedidosComponent implements OnInit {
   customer : Customer [] = [];
   payments$: Observable<Payments[]>;
   product: viewProducts[]=[];
+  lineOrder: LinesOrders [] = [];
+
   selectedProduct: viewProducts;
 
   orderId: number;
+  lineOrd: number;
   createHead: boolean = false;
 
   selectedCodArt: number;
@@ -128,6 +135,7 @@ export class PedidosComponent implements OnInit {
       this.spinner();
       
     });
+
   }
 
   spinner()
@@ -168,10 +176,10 @@ export class PedidosComponent implements OnInit {
       try {
         this.svcOrders.new(this.headForm.value).subscribe(
           ord => {
-            console.log('pedido creado: ',ord);
+            //console.log('pedido creado: ',ord);
             
             this.orderId = ord.NumPed;
-            console.log(this.orderId,ord.NumPed);
+            //console.log(this.orderId,ord.NumPed);
             
           }
         );
@@ -204,31 +212,9 @@ export class PedidosComponent implements OnInit {
       }
     }
   }
-  /*onChangeArt(event:any){
 
-    for(let i=0; i < this.product.length;i++)
-    {
-      if (this.product[i].ID === event.value)
-      {
-       // console.log(event.value,this.product[i]);
-        this.svcProd.getById(event.value).subscribe(prod => {
-
-          this.selectedProduct = prod;
-//          console.log(this.selectedProduct,'precio rebajado: ',this.selectedProduct.precioRebajado);
-
-          this.artForm.patchValue({
-            NumPed: this.orderId,
-            Descripcion : this.selectedProduct.Articulo,
-            Precio : this.selectedProduct.precioRebajado || 0
-          })
-
-        });
-
-      }
-    }
-  }*/
   onSelectArt (item:any) {
-    console.log(item);
+    //console.log(item);
     this.artForm.patchValue({
       NumPed: this.orderId,
       CodArticulo: item.ID,
@@ -243,9 +229,15 @@ export class PedidosComponent implements OnInit {
 
   onAddArt():void
   {
-    console.log('añade un articulo',this.artForm.value);
+    //console.log('añade un articulo',this.artForm.value);
     try {
-      this.svdLinOrd.new(this.artForm.value).subscribe();
+      this.svdLinOrd.new(this.artForm.value).subscribe( line => {
+        this.lineOrder.push(line);
+        this.dataSourceOrder.data = this.lineOrder;
+      //  console.log(this.lineOrder);
+        
+      });
+
       window.alert('Línea creada correctamente.');
     } catch (error) {
       console.log('Error creando pedido.')

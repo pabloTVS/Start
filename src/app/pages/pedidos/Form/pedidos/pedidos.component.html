@@ -57,7 +57,7 @@
       
     </form>
 </ng-container>
-<div>
+<div class="findArt">
       <mat-form-field >
         <mat-label>Búsqueda</mat-label>
         <input matInput (keyup)="applyFilter($event)" placeholder="Dígite el texto a buscar" #input>
@@ -65,14 +65,6 @@
       
       <div class="mat-elevation-z8">
         <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
-      
-          <ng-container matColumnDef="Imagen">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Imagen </th>
-            <td mat-cell *matCellDef="let element">
-              <img src={{element.Imagen}}  style="max-width:100%;width:auto;height:auto;"/>
-            </td>
-          </ng-container>
-      
           <ng-container matColumnDef="Articulo">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Artículo </th>
             <td mat-cell *matCellDef="let element"> {{element.Articulo}} </td>
@@ -114,7 +106,7 @@
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
       
-        <mat-paginator [pageSizeOptions]="[2,5]" showFirstLastButtons></mat-paginator>
+        <mat-paginator [pageSizeOptions]="[5,15]" showFirstLastButtons></mat-paginator>
       </div>
       
     </div>
@@ -127,14 +119,6 @@
           novalidate
           [formGroup]="artForm"
           (ngSubmit)="onAddArt()">
- <!--       <mat-form-field class="inputMedium" *ngIf = "product" appearance="fill">
-            <mat-label>Artículo</mat-label>
-            <mat-select formControlName="CodArt" (selectionChange)="onChangeArt($event)" placeholder="Selecciona un artículo" [(value)]="selectedCodArt">
-              <mat-option *ngFor="let art of product" [value]="art.ID">
-                {{art.ID}}
-              </mat-option>
-            </mat-select>
-        </mat-form-field>-->
           <mat-form-field class="inputBig" hintLabel="Max. 150 caracteres" appearance="fill">
             <mat-label>Descripcion</mat-label>
             <input formControlName="Descripcion" matInput [ngClass]="{'is-invalid': isValidFieldArt('Descripcion')}">
@@ -203,14 +187,141 @@
         </mat-card-actions>
         </form>
       </mat-card-content>
-  <!--    <mat-card-actions align="medium">
-
-      </mat-card-actions>
       <mat-card-footer>
-        <p>Linea añadida</p>
-      </mat-card-footer>-->
+      <mat-card-subtitle>Líenas añadidas</mat-card-subtitle>  
+      <table mat-table [dataSource]="dataSourceOrder" class="mat-elevation-z8">
+
+        <!--- Note that these columns can be defined in any order.
+              The actual rendered columns are set as a property on the row definition" -->
+      
+        <!-- Position Column -->
+        <ng-container matColumnDef="NumPed">
+          <th mat-header-cell *matHeaderCellDef> No. </th>
+          <td mat-cell *matCellDef="let element"> {{element.NumPed}} </td>
+        </ng-container>
+      
+        <!-- Name Column -->
+        <ng-container matColumnDef="CodArticulo">
+          <th mat-header-cell *matHeaderCellDef> Articulo </th>
+          <td mat-cell *matCellDef="let element"> {{element.CodArticulo}} </td>
+        </ng-container>
+      
+        <!-- Weight Column -->
+        <ng-container matColumnDef="Descripcion">
+          <th mat-header-cell *matHeaderCellDef> Descripcion </th>
+          <td mat-cell *matCellDef="let element"> {{element.Descripcion}} </td>
+        </ng-container>
+      
+        <!-- Symbol Column -->
+        <ng-container matColumnDef="Cantidad">
+          <th mat-header-cell *matHeaderCellDef> Cantidad </th>
+          <td mat-cell *matCellDef="let element"> {{element.Cantidad}} </td>
+        </ng-container>
+      
+
+        <ng-container matColumnDef="Precio">
+          <th mat-header-cell *matHeaderCellDef> Precio </th>
+          <td mat-cell *matCellDef="let element"> {{element.Precio}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="IVA">
+          <th mat-header-cell *matHeaderCellDef> IVA </th>
+          <td mat-cell *matCellDef="let element"> {{element.IVA}} </td>
+        </ng-container>        
+
+        <ng-container matColumnDef="DtoC">
+          <th mat-header-cell *matHeaderCellDef> Dto </th>
+          <td mat-cell *matCellDef="let element"> {{element.DtoC}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="DtoPP">
+          <th mat-header-cell *matHeaderCellDef> Dto. PP </th>
+          <td mat-cell *matCellDef="let element"> {{element.DtoPP}} </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumnsOrder"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumnsOrder;"></tr>
+      </table>
+     <!-- <mat-list role="list">
+        <mat-list-item role="listitem" *ngFor="let item of lineOrder">
+          NumPed: {{item.NumPed}} 
+          CodArt: {{item.CodArticulo}}
+          Descripcion: {{item.Descripcion}} 
+          Q: {{item.Cantidad}} 
+          Precio: {{item.Precio}} 
+          DtoCom: {{item.DtoC}}
+          DtoPP: {{item.DtoPP}} 
+        </mat-list-item>
+      </mat-list>
+      -->
+      </mat-card-footer>
   </mat-card>
 </ng-container>
+<!--
+<ng-container>
+  <div class="mat-elevation-z8">
+    <table mat-table [dataSource]="(linOrder$ | async).data" matSort class="mat-elevation-z8">
+  
+      <ng-container matColumnDef="CodArticulo">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Código </th>
+        <td mat-cell *matCellDef="let element">
+          {{element.CodArticulo}}
+        </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="Descripcion">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Artículo </th>
+        <td mat-cell *matCellDef="let element"> {{element.Descripcion}} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="Cantidad">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Cantidad </th>
+        <td mat-cell *matCellDef="let element"> {{element.Cantidad}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Precio">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Precio </th>
+        <td mat-cell *matCellDef="let element"> {{element.Precio}} </td>
+      </ng-container>          
+  
+      <ng-container matColumnDef="DtoC">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> % Dto. Comercial </th>
+        <td mat-cell *matCellDef="let element"> {{element.DtoC}} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="ImporteDtoC">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Importe Dto. Com. </th>
+        <td mat-cell *matCellDef="let element"> {{element.ImporteDtoC}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="BaseImponible">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Total neto línea  </th>
+        <td mat-cell *matCellDef="let element"> {{element.BaseImponible}} </td>
+      </ng-container>
+
+      
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Acciones</th>
+        <td mat-cell *matCellDef="let element">
+          <div class="table-button-row">
+           
+  
+            <button mat-button color="accent" (click)="onSelectArt(element)">Borrar línea</button>
+           </div>
+  
+        </td>
+      </ng-container>
+  
+      <tr mat-header-row *matHeaderRowDef="displayedColumnsLines"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumnsLines;"></tr>
+    </table>
+  
+    <mat-paginator [pageSizeOptions]="[10,25]" showFirstLastButtons></mat-paginator>
+  </div>
+
+</ng-container>
+-->
+<!--
 <pre>
   Dirty:
   head: {{ headForm.dirty }}
@@ -242,3 +353,4 @@
   {{ headForm.invalid }}
   {{ artForm.invalid }}
 </pre>
+-->

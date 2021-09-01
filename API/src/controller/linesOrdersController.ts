@@ -29,6 +29,7 @@ export class LinesOrdersController {
     static new = async (req: Request, res: Response) => {
         const {NumPed,CodArticulo,PCosto,Descripcion,Cantidad,Precio,DtoC,DtoPP,IVA,RE,CodOferta,LinOferta} = req.body;
         const line = new linorders;
+        let newLine: linorders;
         
         line.NumPed = NumPed;
         line.CodArticulo = CodArticulo;
@@ -52,7 +53,7 @@ export class LinesOrdersController {
         
         //grabo la nueva linea
         try {
-            await linorderRepository.save(line);
+            newLine = await linorderRepository.save(line);
             //const newLin = await linorderRepository.findOneOrFail(line.IdLinPed);
             //res.status(201).json({line,newLin});    
         } catch (e) {
@@ -70,8 +71,8 @@ export class LinesOrdersController {
         } catch (e) {
             return res.status(409).json(e.message);  
         }
-
-        res.status(201).json({message: 'Línea añadida correctamente'});
+        res.send(newLine);
+        //res.status(201).json({message: 'Línea añadida correctamente'});
     };
 
     static delete = async (req: Request, res: Response) => {
