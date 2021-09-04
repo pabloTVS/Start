@@ -29,4 +29,5 @@ export class vieworders {
     @Column("date") FechaFra: string;
     @Column("int") CodDestino: number;    
     @Column("decimal",{precision:18.2}) DtoPP: number;
+    @Column() Observaciones: string;
 }

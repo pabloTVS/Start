@@ -10,15 +10,16 @@ export class OrdersController {
     static getAllOrders = async (req: Request, res: Response) => {
         const {CodComercial,CodCli,Role} = req.params;
         const ordersRepository = getRepository(vieworders);
-  
+        let orders : vieworders[];
+
         if (Role === 'Admin') //Si eres Admin lo muestra siempre.
         {
-            let orders:any;
+          
             try {
               orders = await ordersRepository.createQueryBuilder().
               select(["ord.NumPed","ord.Serie","ord.Fecha","case when ord.estado = 1 then '' else ord.FechaEntrega end FechaEntrega","ord.CodComercial","ord.Comercial","ord.CodCli","ord.NombreCliente","ord.DenominacionComercial","ord.Destino","ord.Direccion",
               "ord.Localidad","ord.CodPostal","ord.Provincia","ord.Total","ord.Pagado","ord.Pendiente","ord.CodFormaPago","ord.DescripcionFormaPago","ord.CodigoEstado","ord.Estado",
-              "ord.PorcComision","ord.SerieFra","ord.NumFra","ord.FechaFra","ord.CodDestino","ord.CodDestino","ord.DtoPP","ord.Observaciones"]).
+              "ord.PorcComision","ord.SerieFra","ord.NumFra","ord.FechaFra","ord.CodDestino","ord.DtoPP","ord.Observaciones"]).
               from(vieworders,"ord").where("ord.NumPed != 0").orderBy("ord.Fecha","DESC").getMany();
 //              orders = await ordersRepository.find();
                 res.send(orders);
@@ -29,13 +30,12 @@ export class OrdersController {
     
         }   
         else if (Role === 'Comercial') {
-            let orders : vieworders[];
-                
+                       
             try {
             orders = await ordersRepository.createQueryBuilder().
             select(["ord.NumPed","ord.Serie","ord.Fecha","ord.FechaEntrega","ord.CodComercial","ord.Comercial","ord.CodCli","ord.NombreCliente","ord.DenominacionComercial","ord.Destino","ord.Direccion",
             "ord.Localidad","ord.CodPostal","ord.Provincia","ord.Total","ord.Pagado","ord.Pendiente","ord.CodFormaPago","ord.DescripcionFormaPago","ord.CodigoEstado","ord.Estado",
-            "ord.PorcComision","ord.SerieFra","ord.NumFra","ord.FechaFra","ord.CodDestino","ord.CodDestino","ord.DtoPP","ord.Observaciones"]).
+            "ord.PorcComision","ord.SerieFra","ord.NumFra","ord.FechaFra","ord.CodDestino","ord.DtoPP","ord.Observaciones"]).
             from(vieworders,"ord").where("ord.CodComercial =:com ",{com: CodComercial}).getMany();
 
             orders ? res.send(orders) :  res.status(404).json({ message: 'No se ha devuelto ningún valor.' });
@@ -45,13 +45,12 @@ export class OrdersController {
             } 
           }
           else if (Role === 'Suscriptor'){
-              let orders : vieworders[];
                   
               try {
               orders = await ordersRepository.createQueryBuilder().
               select(["ord.NumPed","ord.Serie","ord.Fecha","ord.FechaEntrega","ord.CodComercial","ord.Comercial","ord.CodCli","ord.NombreCliente","ord.DenominacionComercial","ord.Destino","ord.Direccion",
               "ord.Localidad","ord.CodPostal","ord.Provincia","ord.Total","ord.Pagado","ord.Pendiente","ord.CodFormaPago","ord.DescripcionFormaPago","ord.CodigoEstado","ord.Estado",
-              "ord.PorcComision","ord.SerieFra","ord.NumFra","ord.FechaFra","ord.CodDestino","ord.CodDestino","ord.DtoPP","ord.Observaciones"]).
+              "ord.PorcComision","ord.SerieFra","ord.NumFra","ord.FechaFra","ord.CodDestino","ord.DtoPP","ord.Observaciones"]).
               from(vieworders,"ord").where("ord.CodCli =:cli ",{cli: CodCli}).getMany();
 
               orders ? res.send(orders) :  res.status(404).json({ message: 'No se ha devuelto ningún valor.' });
@@ -64,15 +63,15 @@ export class OrdersController {
   //only order
     static getById = async (req: Request, res: Response) => {
         const {NumPedido} = req.params;
-        const orderRepository = getRepository(Orders);
-        let orders : Orders[];
+        const orderRepository = getRepository(vieworders);
+        let orders : vieworders[];
                 
         try {
         orders = await orderRepository.createQueryBuilder().
         select(["ord.NumPed","ord.Serie","ord.Fecha","ord.FechaEntrega","ord.CodCli","ord.DtoPP","ord.Observaciones","ord.TotalPedido",
         "ord.TotalPagado","ord.TotalPendiente","ord.NumFra","ord.SerieFra","ord.FechaFra","ord.CodComercial","ord.Comision","ord.CodDestino","ord.CodOrdStatus","ord.CodFormaPago"]).
         from(Orders,"ord").where("ord.NumPed =:ped ",{ped: NumPedido}).getMany();
-
+        //orders = await orderRepository.findOneOrFail()
         orders ? res.send(orders) :  res.status(404).json({ message: 'No se ha devuelto ningún valor.' });
         }
         catch (e) {

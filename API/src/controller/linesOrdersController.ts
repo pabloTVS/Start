@@ -27,7 +27,7 @@ export class LinesOrdersController {
     } 
     //new line
     static new = async (req: Request, res: Response) => {
-        const {NumPed,CodArticulo,PCosto,Descripcion,Cantidad,Precio,DtoC,DtoPP,IVA,RE,CodOferta,LinOferta} = req.body;
+        const {NumPed,CodArticulo,PCosto,Descripcion,Cantidad,Precio,DtoC,DtoPP,PorcIVA,RE,CodOferta,LinOferta} = req.body;
         const line = new linorders;
         let newLine: linorders;
         
@@ -39,7 +39,7 @@ export class LinesOrdersController {
         line.Precio = Precio;
         line.DtoC = DtoC;
         line.DtoPP = DtoPP;
-        line.IVA = IVA;
+        line.IVA = PorcIVA;
         line.RE = RE;
         line.CodOferta = CodOferta;
         line.LinOferta = LinOferta;

@@ -14,7 +14,6 @@ import { AuthService } from '@app/pages/auth/auth.service';
 import { productsService } from '@app/pages/products/services/products.service'
 import { SpinnerOverlayService } from '@shared/services/spinner-overlay.service'
 
-import { Orders } from '@shared/models/orders.interface'
 import { LinesOrders } from '@shared/models/linesOrders.interface';
 import { Customer } from '@app/shared/models/customer.interface';
 import { Payments } from '@shared/models/payments.interface';
@@ -36,12 +35,37 @@ export interface orderSerie {
   styleUrls: ['./pedidos.component.scss']
 })
 export class PedidosComponent implements OnInit {
-  displayedColumns: string[] = ['Articulo', 'Sku', 'RefProveedor','Precio','PrecioRebajado','actions'];
+  displayedColumns: string[] = ['Imagen','Articulo', 'Sku', 'refproveedor','Precio','PrecioRebajado','actions'];
   dataSource = new MatTableDataSource();
 
-  displayedColumnsOrder: string[] = ['NumPed', 'CodArticulo', 'Descripcion','Cantidad','Precio','IVA','DtoC','DtoPP'];
+  displayedColumnsOrder: string[] = ['CodArticulo', 'Descripcion','Cantidad','Precio','IVA','DtoC','DtoPP'];
   dataSourceOrder = new MatTableDataSource();
   
+  headForm = this.fb.group({
+    Serie: ['A',[Validators.required]],
+    CodCli: ['',[Validators.required]],
+    DtoPP: [0,[Validators.min(0),Validators.max(100),Validators.required,Validators.pattern('^[0-9.]+$')]],
+    DtoComercial: [0,[Validators.min(0),Validators.max(100),Validators.required,Validators.pattern('^[0-9.]+$')]],
+    CodFormaPago: [,[Validators.required,Validators.pattern('^[0-9]+$')]],
+    CodComercial: [0, [Validators.required,Validators.pattern('^[0-9]+$')]],
+    CodOrdStatus: [1,[Validators.required,Validators.pattern('^[0-1]+$')]],
+    CodDestino: [0, [Validators.required,Validators.pattern('^[0-9]+$')]],
+    Observaciones: [''],
+    TotalPedido: [0]
+  });
+
+  artForm = this.fb.group({
+    NumPed: [],
+    CodArticulo:[],
+    PCosto:[0],
+    Descripcion: ['',[Validators.required]],
+    Cantidad: [1,[Validators.required,Validators.min(0),Validators.pattern('^[0-9.]+$')]],
+    Precio: [0,[Validators.required,Validators.pattern('^[A-Z0-9.]+$')]],
+    DtoC: [0,[Validators.min(0),Validators.max(100),Validators.required,Validators.pattern('^[0-9.]+$')]],
+    DtoPP: [0,[Validators.min(0),Validators.max(100),Validators.required,Validators.pattern('^[0-9.]+$')]],
+    PorcIVA: [0,[Validators.min(0),Validators.max(100),Validators.required,Validators.pattern('^[0-9.]+$')]],
+    RE: [0]
+  });
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -54,36 +78,33 @@ export class PedidosComponent implements OnInit {
 
   serie: orderSerie[] =
   [
-    {value: 'A', viewValue: 'Serie A'},
-    {value: 'M', viewValue: 'Serie M'}
+    {value: 'A', viewValue: 'Serie A'}
   ];
 
-  order :Orders;
+ // order :Orders;
   linOrder$ : Observable<LinesOrders []>;
   customer : Customer [] = [];
   payments$: Observable<Payments[]>;
   product: viewProducts[]=[];
   lineOrder: LinesOrders [] = [];
 
-  selectedProduct: viewProducts;
-
+  viewmode: boolean = false; //contrala la vista del formulario.
   orderId: number;
   lineOrd: number;
   createHead: boolean = false;
 
-  selectedCodArt: number;
-  selectedState: number;
-  selectedCommercial: number;
   selectedPayment: number;
   selectedCodCli: number;
   selectedDtoPP: number;
   selectedDtoComercial: number;
+  selectedIVA: number;
   selectedSerie: string;
 
   constructor(
     private fb: FormBuilder,
+    private route: ActivatedRoute,
     private svcOrders: OrdersService,
-    private svdLinOrd: LineOrdersService,
+    private svcLinOrd: LineOrdersService,
     private svcCustomer: CustomersService,
     private svcPay: PaymentsService,
     private svcProd: productsService,
@@ -96,54 +117,59 @@ export class PedidosComponent implements OnInit {
   role = this.userValue.role;
   codCli = this.userValue.customer;
 
-  headForm = this.fb.group({
-    Serie: ['A',[Validators.required]],
-    CodCli: ['',[Validators.required]],
-    DtoPP: [0,[Validators.min(0),Validators.max(100),Validators.required,Validators.pattern('^[0-9.]+$')]],
-    DtoComercial: [0,[Validators.min(0),Validators.max(100),Validators.required,Validators.pattern('^[0-9.]+$')]],
-    CodFormaPago: [,[Validators.required,Validators.pattern('^[0-9]+$')]],
-    CodComercial: [0, [Validators.required,Validators.pattern('^[0-9]+$')]],
-    CodOrdStatus: [1,[Validators.required,Validators.pattern('^[0-1]+$')]],
-    CodDestino: [0, [Validators.required,Validators.pattern('^[0-9]+$')]],
-    Observaciones: ['']
-  });
-
-  artForm = this.fb.group({
-    NumPed: [],
-    CodArticulo:[],
-    PCosto:[],
-    Descripcion: ['',[Validators.required]],
-    Cantidad: [1,[Validators.required,Validators.min(0),Validators.pattern('^[0-9.]+$')]],
-    Precio: [0,[Validators.required,Validators.pattern('^[A-Z0-9.]+$')]],
-    DtoC: [0,[Validators.min(0),Validators.max(100),Validators.required,Validators.pattern('^[0-9.]+$')]],
-    DtoPP: [0,[Validators.min(0),Validators.max(100),Validators.required,Validators.pattern('^[0-9.]+$')]],
-    IVA:[],
-    RE: [0]
-  });
-
   ngOnInit(): void {
-    this.spinner();
-    if (!this.codCli)
-      this.svcCustomer.getAll(this.codCom,this.role).subscribe(cust => {this.customer = cust;});
-    else
-      this.selectedCodCli = this.codCli;
+    try
+    {
+      this.route.queryParams.subscribe(params => {
+        // Defaults to 0 if no query param provided.
+        this.orderId = +params['Id'] || 0;
+      });
 
-    this.payments$ = this.svcPay.getAll();
-    this.svcProd.getAllProducts().subscribe( prod => {
-      this.product=prod;
-      this.dataSource.data=prod;
-      this.spinner();
-      
-    });
+      if (this.orderId !=0)
+      {
+         this.viewmode = true;
+         this.svcOrders.getById(this.orderId).subscribe(ord =>{
+           console.log('cabecera->',ord);
+           this.selectedCodCli = ord.CodCli
+           
+           //this.headForm.patchValue(order);
+         });
+         console.log('cliene ',this.selectedCodCli);
+         
+         this.svcCustomer.getById(this.selectedCodCli).subscribe(cust=>{console.log('datos cliente',cust);});
 
+         this.svcLinOrd.getLinOrder(this.orderId).subscribe(lines =>{
+           console.log('lineas->',lines);
+           //this.artForm.patchValue(line);
+         })
+      }  
+      else {    
+        this.viewmode = false;
+        this.spinner();
+        if (!this.codCli)
+          this.svcCustomer.getAll(this.codCom,this.role).subscribe(cust => {this.customer = cust;});
+        else
+          this.selectedCodCli = this.codCli;
+
+        this.payments$ = this.svcPay.getAll();
+        this.svcProd.getAllProducts().subscribe( prod => {
+          this.product=prod;
+          this.dataSource.data=prod;      
+          this.spinner();
+          
+        });
+      }
+    } catch (e) {
+    console.log(e.message);
+    }
   }
 
   spinner()
   {
       this.dataSource.data.length >0 ? this.spinnerSvc.hide() : this.spinnerSvc.show();
   }
+
   ngAfterViewInit() {
-    //this.spinnerSvc.hide();
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
   }
@@ -176,21 +202,15 @@ export class PedidosComponent implements OnInit {
       try {
         this.svcOrders.new(this.headForm.value).subscribe(
           ord => {
-            //console.log('pedido creado: ',ord);
-            
             this.orderId = ord.NumPed;
-            //console.log(this.orderId,ord.NumPed);
-            
+            this.createHead = true;
           }
         );
-        window.alert('Cabecera de pedido creada correctamente.')
-        this.createHead = true;
         this.headForm.disable(); //desactivo el form.
       } catch (error) {
         console.log('Error creando pedido.')
       }
     }
-    //console.log('se ha grabado la cabecera',this.headForm.value);
   }
 
   onChangeCustomer(event:any){
@@ -208,37 +228,45 @@ export class PedidosComponent implements OnInit {
         this.artForm.patchValue({
           DtoC: this.customer[i].DtoComercial,
           DtoPP: this.customer[i].DtoPP
-        })
+        });
+        this.selectedDtoComercial = this.customer[i].DtoComercial;
+        this.selectedDtoPP = this.customer[i].DtoPP;
       }
     }
   }
 
   onSelectArt (item:any) {
-    //console.log(item);
+    console.log('Articulos-> ',item);
     this.artForm.patchValue({
       NumPed: this.orderId,
       CodArticulo: item.ID,
-      PCosto: item.PCoste,
+      PCosto: item.PCoste || 0,
       Descripcion : item.Articulo,
-      IVA: item.IVA,
-      Precio : item.PrecioRebajado || 0
+      PorcIVA: item.PorcIVA || 0,
+      Precio : item.PrecioRebajado || item.Precio,
+      DtoC: this.selectedDtoComercial || 0,
+      DtoPP: this.selectedDtoPP || 0,
+      RE: 0
     })
-
-
   }
 
   onAddArt():void
   {
-    //console.log('añade un articulo',this.artForm.value);
+    console.log('añade un articulo',this.artForm.value);
     try {
-      this.svdLinOrd.new(this.artForm.value).subscribe( line => {
+      this.svcLinOrd.new(this.artForm.value).subscribe( line => {
         this.lineOrder.push(line);
         this.dataSourceOrder.data = this.lineOrder;
-      //  console.log(this.lineOrder);
-        
       });
-
-      window.alert('Línea creada correctamente.');
+      this.artForm.reset({
+        NumPed: this.orderId,
+        Cantidad: 1,
+        PCosto: 0,
+        PorcIVA: 0,
+        Precio: 0,
+        DtoC: this.selectedDtoComercial || 0,
+        DtoPP: this.selectedDtoPP || 0
+      });
     } catch (error) {
       console.log('Error creando pedido.')
     }

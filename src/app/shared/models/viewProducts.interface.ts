@@ -1,17 +1,22 @@
 export interface viewProducts {
     ID: number;
     Articulo: string;
-    Sku: string;
+    Url: string;
+    DescLarga: string;
+    DescCorta: string;
+    Estado: string;
     Precio: string;
     precioRebajado: string;
-    IVA: string;
+    PCoste: string;
+    Sku: string;
     Stock: string;
-    det_Imagen: string;
+    IVA: string;
+    PorcIVA: string;
+    refproveedor: string;
+    Imagen: string;
     Proveedor: string;
     Categoria: string;
     Subcategoria: string;
-    Estado: string;
-    RefProveedor: string;
     IdProveedor: string;
     IdCategoria: string;
     IdSubCategoria: string;

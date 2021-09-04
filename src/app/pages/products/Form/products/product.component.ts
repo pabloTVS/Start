@@ -56,7 +56,8 @@ export class ProductComponent implements OnInit {
   [
     {value: '', viewValue: '21%'},
     {value: 'tasa-reducida', viewValue: '10%'},
-    {value: 'tasa-superreducida', viewValue: '4%'}
+    {value: 'tasa-superreducida', viewValue: '4%'},
+    {value: 'tasa-cero', viewValue: '0%'}
   ];
 
   catElement: categories [] = [];
@@ -75,14 +76,14 @@ export class ProductComponent implements OnInit {
     Url: ['',[Validators.required,Validators.minLength(3),Validators.pattern('^[A-Za-z0-9-_ñÑáéíóúÁÉÍÓÚ]+$')]],
     DescCorta: [''],
     Estado: [''],
-    sku: ['',[Validators.required]],
+    Sku: ['',[Validators.required]],
     refproveedor: [''], 
-    iva: [''],
-    precio: [0,[Validators.min(0),Validators.required,Validators.pattern('^[A-Z0-9.]+$')]],
-    precioRebajado: [0,[Validators.min(0),Validators.required,Validators.pattern('^[A-Z0-9.]+$')]],
-    precioCoste: [0,[Validators.min(0),Validators.required,Validators.pattern('^[A-Z0-9.]+$')]],
-    stock: [0,[Validators.min(0),Validators.pattern('^[0-9]+$')]],
-    det_Imagen: [''],
+    IVA: [''],
+    Precio: [0,[Validators.min(0),Validators.required,Validators.pattern('^[A-Z0-9.]+$')]],
+    PrecioRebajado: [0,[Validators.min(0),Validators.required,Validators.pattern('^[A-Z0-9.]+$')]],
+    PCoste: [0,[Validators.min(0),Validators.required,Validators.pattern('^[A-Z0-9.]+$')]],
+    Stock: [0,[Validators.min(0),Validators.pattern('^[0-9]+$')]],
+    Imagen: [''],
     IdProveedor: ['',[Validators.required]],
     IdCategoria: ['',[Validators.required]],
     IdSubCategoria: ['',[Validators.required]]
@@ -97,7 +98,7 @@ export class ProductComponent implements OnInit {
       if (this.custProduct !=0)
       {
          this.prodSvc.getById(this.custProduct).subscribe(prod =>{
-          // console.log(prod);
+           console.log(prod);
            this.product = prod;
            this.productForm.patchValue(this.product);
            this.selectedState = prod.Estado;
@@ -105,7 +106,7 @@ export class ProductComponent implements OnInit {
            this.selectedCat = prod.IdCategoria;
            this.selectedSubcat = prod.IdSubCategoria;
            this.selectedProve = prod.IdProveedor;
-           this.imagen = prod.det_Imagen;
+           this.imagen = prod.Imagen;
          })
 
          this.catSvc.getAllCategory().subscribe(cat =>{
@@ -134,6 +135,8 @@ export class ProductComponent implements OnInit {
 
   onSubmit(): void {
     try {
+      console.log('valor form: ',this.productForm.value);
+      
       this.prodSvc.updateProducts(this.custProduct,this.productForm.value).subscribe();
       window.alert('Cambios guardados correctamente.')
 
