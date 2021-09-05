@@ -24,6 +24,7 @@ export interface ViewOrders{
     SerieFra: string;
     NumFra: number;
     FechaFra: string;
-    CodDestino: number;    
+    CodDestino: number;
     DtoPP: number;
+    Observaciones: string;
 }

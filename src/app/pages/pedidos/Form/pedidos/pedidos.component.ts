@@ -2,6 +2,7 @@ import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
+import { filter,take ,map} from 'rxjs/operators'
 import { MatSort} from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -35,12 +36,27 @@ export interface orderSerie {
   styleUrls: ['./pedidos.component.scss']
 })
 export class PedidosComponent implements OnInit {
+
+  constructor(
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private svcOrders: OrdersService,
+    private svcLinOrd: LineOrdersService,
+    private svcCustomer: CustomersService,
+    private svcPay: PaymentsService,
+    private svcProd: productsService,
+    private authSvc: AuthService,
+    private spinnerSvc: SpinnerOverlayService) { }
+
   displayedColumns: string[] = ['Imagen','Articulo', 'Sku', 'refproveedor','Precio','PrecioRebajado','actions'];
   dataSource = new MatTableDataSource();
 
   displayedColumnsOrder: string[] = ['CodArticulo', 'Descripcion','Cantidad','Precio','IVA','DtoC','DtoPP'];
   dataSourceOrder = new MatTableDataSource();
-  
+
+  displayedColumnViewlines: string[] =['CodArticulo', 'Descripcion','Cantidad','Precio','DtoC','SubTotal','DtoPP','BaseImponible','IVA','ImporteIVA','RE','ImporteRE','Total']
+  dataSourceViewlines = new MatTableDataSource();
+
   headForm = this.fb.group({
     Serie: ['A',[Validators.required]],
     CodCli: ['',[Validators.required]],
@@ -66,6 +82,28 @@ export class PedidosComponent implements OnInit {
     PorcIVA: [0,[Validators.min(0),Validators.max(100),Validators.required,Validators.pattern('^[0-9.]+$')]],
     RE: [0]
   });
+
+  headviewForm = this.fb.group({
+    NumPed: [],
+    Serie: [],
+    DtoPP: [],
+    Fecha: [],
+    FechaEntrega: [],
+    Comercial: [],
+    CodCli: [],
+    NombreCliente: [],
+    DenominacionComercial: [],
+    Destino: [],
+    Direccion: [],
+    Localidad: [],
+    CodPostal: [],
+    Provincia: [],
+    Total: [],
+    DescripcionFormaPago: [],
+    Estado: [],
+    Observaciones: []
+  });
+
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -100,17 +138,6 @@ export class PedidosComponent implements OnInit {
   selectedIVA: number;
   selectedSerie: string;
 
-  constructor(
-    private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private svcOrders: OrdersService,
-    private svcLinOrd: LineOrdersService,
-    private svcCustomer: CustomersService,
-    private svcPay: PaymentsService,
-    private svcProd: productsService,
-    private authSvc: AuthService,
-    private spinnerSvc: SpinnerOverlayService) { }
-
   //traígo los valores del Observable user.
   userValue = this.authSvc.userValue;
   codCom = this.userValue.commercial;
@@ -128,22 +155,54 @@ export class PedidosComponent implements OnInit {
       if (this.orderId !=0)
       {
          this.viewmode = true;
-         this.svcOrders.getById(this.orderId).subscribe(ord =>{
+         this.svcOrders.getAllOrders(this.codCom,this.codCli,this.role).pipe(
+          map(ord => ord.filter(ord => ord.NumPed === this.orderId)[0])
+         ).subscribe(
+           head => {
+            this.headviewForm.patchValue({
+            NumPed: head.NumPed,
+            Serie: head.Serie,
+            DtoPP: head.DtoPP,
+            Fecha: head.Fecha,
+            FechaEntrega: head.FechaEntrega,
+            Comercial: head.Comercial,
+            CodCli: head.CodCli,
+            NombreCliente: head.NombreCliente,
+            DenominacionComercial: head.DenominacionComercial,
+            Destino: head.Destino,
+            Direccion: head.Direccion,
+            Localidad: head.Localidad,
+            CodPostal: head.CodPostal,
+            Provincia: head.Provincia,
+            Total: head.Total,
+            DescripcionFormaPago: head.DescripcionFormaPago,
+            Estado: head.Estado,
+            Observaciones: head.Observaciones
+            });
+            console.log('viewhead',this.headviewForm.value);
+
+            }
+          )
+
+
+
+         /*this.svcOrders.getById(this.orderId).subscribe(ord =>{
            console.log('cabecera->',ord);
            this.selectedCodCli = ord.CodCli
-           
+
            //this.headForm.patchValue(order);
          });
          console.log('cliene ',this.selectedCodCli);
-         
-         this.svcCustomer.getById(this.selectedCodCli).subscribe(cust=>{console.log('datos cliente',cust);});
+
+         this.svcCustomer.getById(this.selectedCodCli).subscribe(cust=>{console.log('datos cliente',cust);});*/
 
          this.svcLinOrd.getLinOrder(this.orderId).subscribe(lines =>{
            console.log('lineas->',lines);
+           this.dataSourceViewlines.data = lines;
            //this.artForm.patchValue(line);
          })
-      }  
-      else {    
+      }
+      else {
         this.viewmode = false;
         this.spinner();
         if (!this.codCli)
@@ -154,9 +213,9 @@ export class PedidosComponent implements OnInit {
         this.payments$ = this.svcPay.getAll();
         this.svcProd.getAllProducts().subscribe( prod => {
           this.product=prod;
-          this.dataSource.data=prod;      
+          this.dataSource.data=prod;
           this.spinner();
-          
+
         });
       }
     } catch (e) {
@@ -194,9 +253,9 @@ export class PedidosComponent implements OnInit {
     this.artForm.get(name).errors
     return fieldName.invalid && fieldName.touched;
   }
-  
+
   onSubmitHead():void {
-    if (!this.createHead && 
+    if (!this.createHead &&
       (window.confirm('¿Estás seguro de crear el pedido?.\nYa no podrá modificar los datos posteriormente.')) )
     {
       try {
