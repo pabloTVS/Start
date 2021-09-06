@@ -1,6 +1,8 @@
+<mat-card class="button">
+  <a mat-raised-button color="accent" routerLink="/pedidos" >Listado de pedidos</a>
+</mat-card>
 <ng-container class="vista" *ngIf="viewmode">
-  <h1>modo consulta</h1>
-  <form class="headview" [formGroup]="headviewForm">
+    <form class="headview" [formGroup]="headviewForm">
     <mat-card>
         <mat-card-header>
             <mat-card-title justify-content="center" >Datos del pedido</mat-card-title>
@@ -9,9 +11,11 @@
           <div class="datosBasicos">
             <mat-list>
               <mat-list-item><b>Nº Pedido:&nbsp;&nbsp;</b>{{headviewForm.get('NumPed').value}}</mat-list-item>
-              <mat-list-item><b>Estado:&nbsp;</b>{{headviewForm.get('Estado').value}}</mat-list-item>
               <mat-list-item><b>Fecha:&nbsp;</b>{{headviewForm.get('Fecha').value | date:'dd/MM/yyyy'}}</mat-list-item>
               <mat-list-item><b>Fecha de entrega: </b>{{headviewForm.get('FechaEntrega').value | date:'dd/MM/yyyy'}}</mat-list-item>
+              <br>
+              <mat-list-item><b>Estado:&nbsp;</b>{{headviewForm.get('Estado').value}}</mat-list-item>
+              <mat-list-item><b>Total pedido:&nbsp;</b>{{headviewForm.get('Total').value | currency:'EUR'}}</mat-list-item>
               <br>
               <mat-list-item><b>Comercial:&nbsp;</b>{{headviewForm.get('Comercial').value}}</mat-list-item>
               <mat-list-item><b>Forma de pago:&nbsp;</b>{{headviewForm.get('DescripcionFormaPago').value}}</mat-list-item>
@@ -58,6 +62,12 @@
   </form>
   <div class="mat-elevation-z8">
     <table mat-table [dataSource]="dataSourceViewlines" matSort class="mat-elevation-z8">
+      <ng-container matColumnDef="Imagen">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Imagen </th>
+        <td mat-cell *matCellDef="let element">
+          <img src={{element.Imagen}}  style="max-width:100%;width:auto;height:auto;"/>
+        </td>
+      </ng-container>
       <ng-container matColumnDef="CodArticulo">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Artículo </th>
         <td mat-cell *matCellDef="let element"> {{element.CodArticulo}} </td>
@@ -84,7 +94,7 @@
       </ng-container>
 
       <ng-container matColumnDef="SubTotal">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Subtotal </th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Neto </th>
         <td mat-cell *matCellDef="let element"> {{element.SubTotal | number}} </td>
       </ng-container>
 
@@ -102,25 +112,25 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header> %IVA </th>
         <td mat-cell *matCellDef="let element"> {{element.IVA}} </td>
       </ng-container>
-
+<!--
       <ng-container matColumnDef="ImporteIVA">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Importe </th>
         <td mat-cell *matCellDef="let element"> {{element.ImporteIVA | currency:'EUR'}} </td>
       </ng-container>
-
+-->
       <ng-container matColumnDef="RE">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> %RE. </th>
         <td mat-cell *matCellDef="let element"> {{element.RE}} </td>
       </ng-container>
-
+<!--
       <ng-container matColumnDef="ImporteRE">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Importe </th>
         <td mat-cell *matCellDef="let element"> {{element.ImporteRE | currency:'EUR'}} </td>
       </ng-container>
-
+-->
       <ng-container matColumnDef="Total">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Total </th>
-        <td mat-cell *matCellDef="let element"> {{element.Total | currency:'EUR'}} </td>
+        <td mat-cell *matCellDef="let element"> {{element.Total | number}} </td>
       </ng-container>
 
 
@@ -128,15 +138,11 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumnViewlines;"></tr>
     </table>
 
-    <mat-paginator [pageSizeOptions]="[10,25]" showFirstLastButtons></mat-paginator>
+    <mat-paginator [pageSizeOptions]="[5,10,25]" showFirstLastButtons></mat-paginator>
 </div>
 
 </ng-container>
 <ng-container class="vista" *ngIf="!viewmode">
-  <mat-card class="button">
-      <a mat-raised-button color="accent" routerLink="/pedidos" >Listado de pedidos</a>
-  </mat-card>
-
   <ng-container>
       <form
       class="needs-validation"
@@ -267,7 +273,7 @@
                 novalidate
                 [formGroup]="artForm"
                 (ngSubmit)="onAddArt()">
-                <mat-form-field class="inputBig" hintLabel="Max. 150 caracteres" appearance="fill">
+                <mat-form-field class="inputBig" appearance="fill">
                   <mat-label>Descripcion</mat-label>
                   <input formControlName="Descripcion" matInput [ngClass]="{'is-invalid': isValidFieldArt('Descripcion')}">
                     <div class="invalid-feedback">
@@ -302,6 +308,15 @@
                 </mat-form-field>
                 <mat-form-field class="inputSmall" appearance="fill">
                   <mat-label>IVA</mat-label>
+                  <mat-select formControlName="PorcIVA" placeholder="Selecciona IVA" [(value)]="selectedIVA">
+                    <mat-option *ngFor="let vat of typeVat" [value]="vat.value">
+                      {{vat.viewValue}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+    
+<!--                <mat-form-field class="inputSmall" appearance="fill">
+                  <mat-label>IVA</mat-label>
                   <input matInput
                     formControlName="PorcIVA"
                     type="number"
@@ -324,6 +339,7 @@
                       </span>
                     </div>
                 </mat-form-field>
+                -->
                 <mat-form-field class="inputSmall" appearance="fill">
                   <mat-label>Dto. comercial</mat-label>
                   <input matInput

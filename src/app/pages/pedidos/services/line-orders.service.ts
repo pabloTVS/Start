@@ -5,6 +5,7 @@ import { environment } from '@env/environment';
 import { Injectable } from '@angular/core';
 
 import { LinesOrders } from '@shared/models/linesOrders.interface';
+import { ViewLinesOrders } from '@shared/models/viewlinesorders.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +14,8 @@ export class LineOrdersService {
 
   constructor(private http: HttpClient) { }
 
-  getLinOrder(NumPed: number): Observable<LinesOrders[]>{
-    return this.http.get<LinesOrders[]>(`${environment.API_URL}/ordlines/${NumPed}`).
+  getLinOrder(NumPed: number): Observable<ViewLinesOrders[]>{
+    return this.http.get<ViewLinesOrders[]>(`${environment.API_URL}/ordlines/${NumPed}`).
     pipe(catchError(this.handlerError));
   }
 

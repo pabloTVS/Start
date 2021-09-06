@@ -36,8 +36,8 @@ export class PedidosListComponent implements OnInit {
 
   ngOnInit(): void {
     this.spinnerSvc.show();
-    this.svcOrder.getAllOrders(this.codCom,this.codCli,this.role).subscribe((orders) => {this.dataSource.data = orders;console.log(orders);
-    });
+    this.svcOrder.getAllOrders(this.codCom,this.codCli,this.role)
+    .subscribe((orders) => {this.dataSource.data = orders;});
     this.spinnerSvc.hide();
   }
 
@@ -62,7 +62,7 @@ export class PedidosListComponent implements OnInit {
 
   onDelete(item:any) :void 
   {
-    console.log(item);
+   // console.log(item);
     
     if (item.CodigoEstado === 1 
       && window.confirm('¿Estás seguro de borrar este pedido?.')) 
@@ -71,7 +71,7 @@ export class PedidosListComponent implements OnInit {
         this.svcOrder.getAllOrders(this.codCom,this.codCli,this.role).subscribe((orders) => {this.dataSource.data = orders;});
       });
       
-    } else if (item.CodigoEstado > 1) window.alert('Sólo se pueden borrar pedios pendientes.');
+    } else if (item.CodigoEstado > 1) window.alert('Sólo se pueden borrar pedidos pendientes.');
    
   }
 }

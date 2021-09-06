@@ -29,7 +29,10 @@ export interface orderSerie {
   value: string;
   viewValue: string;
 }
-
+export interface typesOfVat {
+  value: number;
+  viewValue: string;
+}
 @Component({
   selector: 'app-pedidos',
   templateUrl: './pedidos.component.html',
@@ -54,7 +57,8 @@ export class PedidosComponent implements OnInit {
   displayedColumnsOrder: string[] = ['CodArticulo', 'Descripcion','Cantidad','Precio','IVA','DtoC','DtoPP'];
   dataSourceOrder = new MatTableDataSource();
 
-  displayedColumnViewlines: string[] =['CodArticulo', 'Descripcion','Cantidad','Precio','DtoC','SubTotal','DtoPP','BaseImponible','IVA','ImporteIVA','RE','ImporteRE','Total']
+//  displayedColumnViewlines: string[] =['CodArticulo', 'Descripcion','Cantidad','Precio','DtoC','SubTotal','DtoPP','BaseImponible','IVA','ImporteIVA','RE','ImporteRE','Total']
+  displayedColumnViewlines: string[] =['Imagen','CodArticulo', 'Descripcion','Cantidad','Precio','DtoC','SubTotal','DtoPP','BaseImponible','IVA','RE','Total']
   dataSourceViewlines = new MatTableDataSource();
 
   headForm = this.fb.group({
@@ -79,7 +83,8 @@ export class PedidosComponent implements OnInit {
     Precio: [0,[Validators.required,Validators.pattern('^[A-Z0-9.]+$')]],
     DtoC: [0,[Validators.min(0),Validators.max(100),Validators.required,Validators.pattern('^[0-9.]+$')]],
     DtoPP: [0,[Validators.min(0),Validators.max(100),Validators.required,Validators.pattern('^[0-9.]+$')]],
-    PorcIVA: [0,[Validators.min(0),Validators.max(100),Validators.required,Validators.pattern('^[0-9.]+$')]],
+    //PorcIVA: [0,[Validators.min(0),Validators.max(100),Validators.required,Validators.pattern('^[0-9.]+$')]],
+    PorcIVA: [0],
     RE: [0]
   });
 
@@ -107,6 +112,14 @@ export class PedidosComponent implements OnInit {
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
+  
+  typeVat: typesOfVat[] = 
+  [
+    {value: 21, viewValue: '21%'},
+    {value: 10, viewValue: '10%'},
+    {value: 4, viewValue: '4%'},
+    {value: 0, viewValue: '0%'}
+  ];
 
   status: orderStatus[] =
   [
@@ -179,7 +192,7 @@ export class PedidosComponent implements OnInit {
             Estado: head.Estado,
             Observaciones: head.Observaciones
             });
-            console.log('viewhead',this.headviewForm.value);
+           // console.log('viewhead',this.headviewForm.value);
 
             }
           )
@@ -197,7 +210,7 @@ export class PedidosComponent implements OnInit {
          this.svcCustomer.getById(this.selectedCodCli).subscribe(cust=>{console.log('datos cliente',cust);});*/
 
          this.svcLinOrd.getLinOrder(this.orderId).subscribe(lines =>{
-           console.log('lineas->',lines);
+           //console.log('lineas->',lines);
            this.dataSourceViewlines.data = lines;
            //this.artForm.patchValue(line);
          })
@@ -206,7 +219,8 @@ export class PedidosComponent implements OnInit {
         this.viewmode = false;
         this.spinner();
         if (!this.codCli)
-          this.svcCustomer.getAll(this.codCom,this.role).subscribe(cust => {this.customer = cust;});
+          this.svcCustomer.getAll(this.codCom,this.role).subscribe(cust => 
+            {this.customer = cust;});
         else
           this.selectedCodCli = this.codCli;
 
@@ -295,7 +309,6 @@ export class PedidosComponent implements OnInit {
   }
 
   onSelectArt (item:any) {
-    console.log('Articulos-> ',item);
     this.artForm.patchValue({
       NumPed: this.orderId,
       CodArticulo: item.ID,
@@ -307,11 +320,12 @@ export class PedidosComponent implements OnInit {
       DtoPP: this.selectedDtoPP || 0,
       RE: 0
     })
+    this.selectedIVA= item.PorcIVA || 0;
   }
 
   onAddArt():void
   {
-    console.log('añade un articulo',this.artForm.value);
+ //   console.log('añade un articulo',this.artForm.value);
     try {
       this.svcLinOrd.new(this.artForm.value).subscribe( line => {
         this.lineOrder.push(line);

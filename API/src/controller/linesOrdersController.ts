@@ -3,6 +3,7 @@ import { Request, Response } from 'express'
 
 
 import { linorders } from '../entity/linOrders'
+import { viewlinesorders } from '../entity/viewLinesOrders'
 import { validate } from 'class-validator';
 
 export class LinesOrdersController {
@@ -10,14 +11,14 @@ export class LinesOrdersController {
         const {NumPedido} = req.params;
         const linOrderRepository = getRepository(linorders);
 
-        let linOrder: linorders[];
+        let linOrder: viewlinesorders[];
 
         try {
             linOrder = await linOrderRepository.createQueryBuilder().
             select(["lin.IdLinPed","lin.NumPed","lin.CodArticulo","lin.PCosto","lin.Descripcion","lin.Cantidad","lin.Precio"
             ,"lin.DtoPP","lin.SubTotal","lin.DtoC","lin.importeDtoC","lin.BaseImponible","lin.IVA","lin.ImporteIVA","lin.RE","lin.ImporteRE",
-            "lin.Total","lin.CodOferta","lin.LinOferta"]).
-            from(linorders,"lin").where("lin.NumPed =:ped ",{ped: NumPedido}).getMany();
+            "lin.Total","lin.CodOferta","lin.LinOferta","lin.Imagen"]).
+            from(viewlinesorders,"lin").where("lin.NumPed =:ped ",{ped: NumPedido}).orderBy("lin.CodArticulo,lin.Descripcion").getMany();
 
             linOrder ? res.send(linOrder) :  res.status(404).json({ message: 'No se ha devuelto ningún valor.' });
 

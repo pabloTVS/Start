@@ -98,7 +98,7 @@ export class ProductComponent implements OnInit {
       if (this.custProduct !=0)
       {
          this.prodSvc.getById(this.custProduct).subscribe(prod =>{
-           console.log(prod);
+           //console.log(prod);
            this.product = prod;
            this.productForm.patchValue(this.product);
            this.selectedState = prod.Estado;
