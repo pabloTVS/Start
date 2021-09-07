@@ -70,7 +70,7 @@ export class OrdersController {
         orders = await orderRepository.createQueryBuilder().
         select(["ord.NumPed","ord.Serie","ord.Fecha","ord.FechaEntrega","ord.CodCli","ord.DtoPP","ord.Observaciones","ord.TotalPedido",
         "ord.TotalPagado","ord.TotalPendiente","ord.NumFra","ord.SerieFra","ord.FechaFra","ord.CodComercial","ord.Comision","ord.CodDestino","ord.CodOrdStatus","ord.CodFormaPago"]).
-        from(Orders,"ord").where("ord.NumPed =:ped ",{ped: NumPedido}).getMany();
+        from(vieworders,"ord").where("ord.NumPed =:ped ",{ped: NumPedido}).getMany();
         //orders = await orderRepository.findOneOrFail()
         orders ? res.send(orders) :  res.status(404).json({ message: 'No se ha devuelto ningún valor.' });
         }
