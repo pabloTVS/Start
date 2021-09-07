@@ -9,8 +9,6 @@ var router = express_1.Router();
 router.get('/', [jwt_1.checkJwt], ProductController_1.ProductController.getAllProducts);
 // Get one product
 router.get('/:Id', [jwt_1.checkJwt, role_1.checkRole(['Admin'])], ProductController_1.ProductController.getById);
-// Get by search
-router.get('/search/:Art', [jwt_1.checkJwt, role_1.checkRole(['Admin'])], ProductController_1.ProductController.getBySearch);
 // Create a new product
 //router.post('/',[checkJwt, checkRole(['Admin'])], UserController.new);
 // Edit product

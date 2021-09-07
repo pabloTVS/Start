@@ -9,6 +9,8 @@ var paym_1 = require("./paym");
 var supp_1 = require("./supp");
 var categ_1 = require("./categ");
 var subcat_1 = require("./subcat");
+var orders_1 = require("./orders");
+var linesOrders_1 = require("./linesOrders");
 var routes = express_1.Router();
 routes.use('/auth', auth_1.default);
 routes.use('/users', user_1.default);
@@ -18,5 +20,7 @@ routes.use('/paym', paym_1.default);
 routes.use('/supp', supp_1.default);
 routes.use('/categ', categ_1.default);
 routes.use('/subcat', subcat_1.default);
+routes.use('/orders', orders_1.default);
+routes.use('/ordlines', linesOrders_1.default);
 exports.default = routes;
 //# sourceMappingURL=index.js.map

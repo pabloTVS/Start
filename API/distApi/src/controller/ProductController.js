@@ -43,6 +43,7 @@ var viewProducts_1 = require("../entity/viewProducts");
 var Product_1 = require("../entity/Product");
 var productDetail_1 = require("../entity/productDetail");
 var wpTermRelation_1 = require("../entity/wpTermRelation");
+var detailproduct_1 = require("../entity/detailproduct");
 var ProductController = /** @class */ (function () {
     function ProductController() {
     }
@@ -55,8 +56,7 @@ var ProductController = /** @class */ (function () {
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, productRepository.createQueryBuilder().select(["product.ID", "product.Articulo", "product.Sku", "product.Imagen", "product.Proveedor", "product.Categoria", "product.Subcategoria"]).
-                            from(viewProducts_1.viewProducts, "product").limit(28000).getMany()];
+                    return [4 /*yield*/, productRepository.find()];
                 case 2:
                     products = _a.sent();
                     products ? res.send(products) : res.status(404).json({ message: 'No se ha devuelto ningún valor.' });
@@ -70,72 +70,47 @@ var ProductController = /** @class */ (function () {
         });
     }); };
     ProductController.getById = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-        var Id, product, producto;
+        var Id, prod, e_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     Id = req.params.Id;
-                    product = /** @class */ (function () {
-                        function product() {
-                        }
-                        return product;
-                    }());
-                    return [4 /*yield*/, typeorm_1.getManager().createQueryBuilder(Product_1.wp_posts, "prod").select(["prod.ID", "prod.post_title Articulo", "prod.post_name Url",
-                            "prod.post_content DescLarga", "prod.post_excerpt DescCorta", "prod.post_status Estado"])
-                            .addSelect(["det.Sku sku", "det.Categoria", "det.Proveedor", "det.Subcategoria", "det.Imagen"])
-                            .innerJoin(viewProducts_1.viewProducts, "det", "prod.ID=det.ID")
-                            .addSelect("det1.meta_value precio")
-                            .innerJoin(productDetail_1.wp_postmeta, "det1", "prod.ID=det1.post_id and det1.meta_key='_regular_price'")
-                            .addSelect("det2.meta_value stock")
-                            .innerJoin(productDetail_1.wp_postmeta, "det2", "prod.ID=det2.post_id and det2.meta_key='_stock'")
-                            .addSelect("det3.meta_value iva")
-                            .innerJoin(productDetail_1.wp_postmeta, "det3", "prod.ID=det3.post_id and det3.meta_key='_tax_class'")
-                            .addSelect("det4.term_taxonomy_id IdProveedor")
-                            .innerJoin(wpTermRelation_1.wp_term_relationships, "det4", "prod.ID=det4.object_id and det4.term_taxonomy_id in (select term_id FROM wp_term_taxonomy WHERE parent = 23 )")
-                            .addSelect("det5.term_taxonomy_id IdCategoria")
-                            .innerJoin(wpTermRelation_1.wp_term_relationships, "det5", "prod.ID=det5.object_id and det5.term_taxonomy_id in (select term_id FROM wp_term_taxonomy WHERE parent = 24 )")
-                            .addSelect("det6.term_taxonomy_id IdSubCategoria")
-                            .innerJoin(wpTermRelation_1.wp_term_relationships, "det6", "prod.ID=det6.object_id and det6.term_taxonomy_id in (select term_id FROM wp_term_taxonomy WHERE parent > 24 )")
-                            .addSelect("det7.meta_value precioRebajado")
-                            .innerJoin(productDetail_1.wp_postmeta, "det7", "prod.ID=det7.post_id and det7.meta_key='_sale_price'")
-                            .addSelect("case when substring(det8.meta_value,1,3) ='<b>' then substring(det8.meta_value,24,length(det8.meta_value)) else det8.meta_value end refproveedor")
-                            .innerJoin(productDetail_1.wp_postmeta, "det8", "prod.ID=det8.post_id and det8.meta_key='refproveedor'")
-                            .addSelect("det9.meta_value precioCoste")
-                            .innerJoin(productDetail_1.wp_postmeta, "det9", "prod.ID=det9.post_id and det9.meta_key='pcoste'")
-                            .where("prod.ID=:id", { id: Id }).getRawOne()];
+                    _a.label = 1;
                 case 1:
-                    producto = _a.sent();
-                    producto ? res.send(producto) : res.status(404).json({ message: 'No se ha devuelto ningún valor.' });
-                    return [2 /*return*/];
-            }
-        });
-    }); };
-    ProductController.getBySearch = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-        var _a, Art, Prov, Cat, Sub, productRepository, products;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0:
-                    _a = req.params, Art = _a.Art, Prov = _a.Prov, Cat = _a.Cat, Sub = _a.Sub;
-                    productRepository = typeorm_1.getRepository(viewProducts_1.viewProducts);
-                    return [4 /*yield*/, productRepository.createQueryBuilder().select(["product.ID", "product.Articulo", "product.Sku", "product.Precio",
-                            "product.IVA", "product.Stock", "product.Imagen", "product.Proveedor", "product.Categoria", "product.Subcategoria"]).
-                            from(viewProducts_1.viewProducts, "product").where("product.Articulo like :art", { art: "%" + Art + "%" }).getMany()];
-                case 1:
-                    products = _b.sent();
-                    //where("product.Articulo like ('%':art'%')",{art: Art}).getMany();
-                    products ? res.send(products) : res.status(404).json({ message: 'No se ha devuelto ningún valor.' });
-                    return [2 /*return*/];
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, typeorm_1.getManager().createQueryBuilder(Product_1.wp_posts, "p").select(["p.ID ID", "p.post_title Articulo", "p.post_name Url", "p.post_content DescLarga", "p.post_excerpt DescCorta", "p.post_status Estado"])
+                            .addSelect(["dt._regular_price Precio", "dt._sale_price PrecioRebajado", "dt._stock Stock", "dt._sku Sku", "dt._tax_class IVA",
+                            "CASE WHEN dt._tax_class ='' THEN 21 ELSE CASE WHEN dt._tax_class = 'tasa-reducida' THEN 10 ELSE CASE WHEN dt._tax_class = 'tasa-superreducida' THEN 4 ELSE 0 END END END PorcIVA",
+                            "case when substring(dt.refproveedor,1,3) ='<b>' then substring(dt.refproveedor,24,length(dt.refproveedor)) else dt.refproveedor end refproveedor", "dt.pcoste PCoste", "fn_imagenArticulo(Id) Imagen",
+                            "(SELECT ter.name Proveedor FROM wp_term_relationships rel left join wp_terms ter on rel.term_taxonomy_id=ter.term_id WHERE rel.object_id = ID AND ter.term_id in (select term_id FROM wp_term_taxonomy WHERE parent = 23)) Proveedor",
+                            "(SELECT ter.name FROM wp_term_relationships rel left join wp_terms ter on rel.term_taxonomy_id=ter.term_id WHERE rel.object_id = ID AND ter.term_id in (select term_id FROM wp_term_taxonomy WHERE parent = 24)) Categoria",
+                            "(SELECT ter.name FROM wp_term_relationships rel left join wp_terms ter on rel.term_taxonomy_id=ter.term_id WHERE rel.object_id = ID AND ter.term_id in (select term_id FROM wp_term_taxonomy WHERE parent > 24)) Subcategoria",
+                            "(SELECT term_taxonomy_id IdCategoria  FROM wp_term_relationships WHERE object_id = ID and term_taxonomy_id in (select term_id FROM wp_term_taxonomy WHERE parent =23)) IdProveedor",
+                            "(SELECT term_taxonomy_id IdCategoria  FROM wp_term_relationships WHERE object_id = ID and term_taxonomy_id in (select term_id FROM wp_term_taxonomy WHERE parent =24)) IdCategoria",
+                            "(SELECT term_taxonomy_id IdCategoria  FROM wp_term_relationships WHERE object_id = ID and term_taxonomy_id in (select term_id FROM wp_term_taxonomy WHERE parent >24)) IdSubCategoria"])
+                            .innerJoin(detailproduct_1.detailproduct, "dt", "p.ID=dt.IdArticulo")
+                            .where("p.post_type = 'product' AND p.ID=:id", { id: Id }).getRawOne()];
+                case 2:
+                    prod = _a.sent();
+                    res.send(prod);
+                    return [3 /*break*/, 4];
+                case 3:
+                    e_2 = _a.sent();
+                    res.status(404).json({ message: 'No se ha devuelto ningún valor.' });
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
             }
         });
     }); };
     ProductController.edit = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-        var view, valorRefProv, Id, _a, Articulo, DescCorta, Url, sku, precio, precioRebajado, iva, Estado, stock, IdCategoria, IdSubCategoria, IdProveedor, refproveedor, precioCoste, viewRepository, e_2, validationOpt, errors, e_3;
+        var view, valorRefProv, Id, _a, Articulo, DescCorta, Url, Sku, Precio, PrecioRebajado, IVA, Estado, Stock, IdCategoria, IdSubCategoria, IdProveedor, refproveedor, PCoste, viewRepository, e_3, validationOpt, errors, e_4;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
                     Id = req.params.Id;
-                    _a = req.body, Articulo = _a.Articulo, DescCorta = _a.DescCorta, Url = _a.Url, sku = _a.sku, precio = _a.precio, precioRebajado = _a.precioRebajado, iva = _a.iva, Estado = _a.Estado, stock = _a.stock, IdCategoria = _a.IdCategoria, IdSubCategoria = _a.IdSubCategoria, IdProveedor = _a.IdProveedor, refproveedor = _a.refproveedor, precioCoste = _a.precioCoste;
-                    valorRefProv = '<b>Ref.Fabricante: </b>' + refproveedor;
+                    _a = req.body, Articulo = _a.Articulo, DescCorta = _a.DescCorta, Url = _a.Url, Sku = _a.Sku, Precio = _a.Precio, PrecioRebajado = _a.PrecioRebajado, IVA = _a.IVA, Estado = _a.Estado, Stock = _a.Stock, IdCategoria = _a.IdCategoria, IdSubCategoria = _a.IdSubCategoria, IdProveedor = _a.IdProveedor, refproveedor = _a.refproveedor, PCoste = _a.PCoste;
+                    if (refproveedor)
+                        valorRefProv = '<b>Ref.Fabricante: </b>' + refproveedor;
                     viewRepository = typeorm_1.getRepository(viewProducts_1.viewProducts);
                     _b.label = 1;
                 case 1:
@@ -145,7 +120,7 @@ var ProductController = /** @class */ (function () {
                     view = _b.sent();
                     return [3 /*break*/, 4];
                 case 3:
-                    e_2 = _b.sent();
+                    e_3 = _b.sent();
                     res.status(404).json({ message: 'No se ha devuelto ningún valor.' });
                     return [3 /*break*/, 4];
                 case 4:
@@ -167,46 +142,46 @@ var ProductController = /** @class */ (function () {
                     _b.sent();
                     //actualizo el resto, tabla detalles.
                     //Actualizamos SKU
-                    return [4 /*yield*/, typeorm_1.getConnection().createQueryBuilder().update(productDetail_1.wp_postmeta).set({ meta_value: sku })
+                    return [4 /*yield*/, typeorm_1.getConnection().createQueryBuilder().update(productDetail_1.wp_postmeta).set({ meta_value: Sku })
                             .where("post_id = :id and meta_key = :type", { id: Id, type: '_sku' }).execute()];
                 case 8:
                     //actualizo el resto, tabla detalles.
                     //Actualizamos SKU
                     _b.sent();
-                    if (!(precioRebajado === "0")) return [3 /*break*/, 11];
+                    if (!(PrecioRebajado === "0")) return [3 /*break*/, 11];
                     return [4 /*yield*/, typeorm_1.getConnection().createQueryBuilder().update(productDetail_1.wp_postmeta).set({ meta_value: '' })
                             .where("post_id = :id and meta_key = :type", { id: Id, type: '_sale_price' }).execute()];
                 case 9:
                     _b.sent();
-                    return [4 /*yield*/, typeorm_1.getConnection().createQueryBuilder().update(productDetail_1.wp_postmeta).set({ meta_value: precio })
+                    return [4 /*yield*/, typeorm_1.getConnection().createQueryBuilder().update(productDetail_1.wp_postmeta).set({ meta_value: Precio })
                             .where("post_id = :id and meta_key = :type", { id: Id, type: '_price' }).execute()];
                 case 10:
                     _b.sent();
                     return [3 /*break*/, 14];
-                case 11: return [4 /*yield*/, typeorm_1.getConnection().createQueryBuilder().update(productDetail_1.wp_postmeta).set({ meta_value: precioRebajado })
+                case 11: return [4 /*yield*/, typeorm_1.getConnection().createQueryBuilder().update(productDetail_1.wp_postmeta).set({ meta_value: PrecioRebajado })
                         .where("post_id = :id and meta_key = :type", { id: Id, type: '_sale_price' }).execute()];
                 case 12:
                     _b.sent();
-                    return [4 /*yield*/, typeorm_1.getConnection().createQueryBuilder().update(productDetail_1.wp_postmeta).set({ meta_value: precioRebajado })
+                    return [4 /*yield*/, typeorm_1.getConnection().createQueryBuilder().update(productDetail_1.wp_postmeta).set({ meta_value: PrecioRebajado })
                             .where("post_id = :id and meta_key = :type", { id: Id, type: '_price' }).execute()];
                 case 13:
                     _b.sent();
                     _b.label = 14;
                 case 14: 
                 //Actualizamos Precio
-                return [4 /*yield*/, typeorm_1.getConnection().createQueryBuilder().update(productDetail_1.wp_postmeta).set({ meta_value: precio })
+                return [4 /*yield*/, typeorm_1.getConnection().createQueryBuilder().update(productDetail_1.wp_postmeta).set({ meta_value: Precio })
                         .where("post_id = :id and meta_key = :type", { id: Id, type: '_regular_price' }).execute()];
                 case 15:
                     //Actualizamos Precio
                     _b.sent();
                     //Actualizamos VAT
-                    return [4 /*yield*/, typeorm_1.getConnection().createQueryBuilder().update(productDetail_1.wp_postmeta).set({ meta_value: iva })
+                    return [4 /*yield*/, typeorm_1.getConnection().createQueryBuilder().update(productDetail_1.wp_postmeta).set({ meta_value: IVA })
                             .where("post_id = :id and meta_key = :type", { id: Id, type: '_tax_class' }).execute()];
                 case 16:
                     //Actualizamos VAT
                     _b.sent();
                     //Actualizamos stock
-                    return [4 /*yield*/, typeorm_1.getConnection().createQueryBuilder().update(productDetail_1.wp_postmeta).set({ meta_value: stock })
+                    return [4 /*yield*/, typeorm_1.getConnection().createQueryBuilder().update(productDetail_1.wp_postmeta).set({ meta_value: Stock })
                             .where("post_id = :id and meta_key = :type", { id: Id, type: '_stock' }).execute()];
                 case 17:
                     //Actualizamos stock
@@ -218,7 +193,7 @@ var ProductController = /** @class */ (function () {
                     //Actualizamos refproveedor
                     _b.sent();
                     //Actualizamos pcoste
-                    return [4 /*yield*/, typeorm_1.getConnection().createQueryBuilder().update(productDetail_1.wp_postmeta).set({ meta_value: precioCoste })
+                    return [4 /*yield*/, typeorm_1.getConnection().createQueryBuilder().update(productDetail_1.wp_postmeta).set({ meta_value: PCoste })
                             .where("post_id = :id and meta_key = :type", { id: Id, type: 'pcoste' }).execute()];
                 case 19:
                     //Actualizamos pcoste
@@ -246,7 +221,7 @@ var ProductController = /** @class */ (function () {
                     _b.sent();
                     return [3 /*break*/, 24];
                 case 23:
-                    e_3 = _b.sent();
+                    e_4 = _b.sent();
                     return [2 /*return*/, res.status(409).json({ message: 'Error guardando el artículo.' })];
                 case 24:
                     res.status(201).json({ message: 'Cambios guardados.' });

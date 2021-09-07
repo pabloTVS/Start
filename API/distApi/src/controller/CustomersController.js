@@ -50,7 +50,7 @@ var CustomerController = /** @class */ (function () {
                 case 0:
                     _a = req.params, CodComercial = _a.CodComercial, Role = _a.Role;
                     customerRepository = typeorm_1.getRepository(Customers_1.Customers);
-                    if (!(CodComercial === 'null' || Role === 'Admin')) return [3 /*break*/, 5];
+                    if (!(Role === 'Admin')) return [3 /*break*/, 5];
                     customer = void 0;
                     _b.label = 1;
                 case 1:
@@ -240,7 +240,7 @@ var CustomerController = /** @class */ (function () {
         });
     }); };
     CustomerController.delete = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-        var IdCliente, customerRepository, customer, e_7;
+        var IdCliente, customerRepository, customer, e_7, e_8;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -257,8 +257,15 @@ var CustomerController = /** @class */ (function () {
                     e_7 = _a.sent();
                     return [2 /*return*/, res.status(404).json({ message: 'Cliente inexistente.' })];
                 case 4:
-                    // Remove customer
-                    customerRepository.delete(IdCliente);
+                    _a.trys.push([4, 6, , 7]);
+                    return [4 /*yield*/, customerRepository.delete(IdCliente)];
+                case 5:
+                    _a.sent();
+                    return [3 /*break*/, 7];
+                case 6:
+                    e_8 = _a.sent();
+                    return [2 /*return*/, res.status(409).json(e_8.message)];
+                case 7:
                     res.status(201).json({ message: ' Cliente borrado' });
                     return [2 /*return*/];
             }

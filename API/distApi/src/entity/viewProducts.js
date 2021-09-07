@@ -25,7 +25,51 @@ var viewProducts = /** @class */ (function () {
     __decorate([
         typeorm_1.Column(),
         __metadata("design:type", String)
+    ], viewProducts.prototype, "Url", void 0);
+    __decorate([
+        typeorm_1.Column(),
+        __metadata("design:type", String)
+    ], viewProducts.prototype, "DescLarga", void 0);
+    __decorate([
+        typeorm_1.Column(),
+        __metadata("design:type", String)
+    ], viewProducts.prototype, "DescCorta", void 0);
+    __decorate([
+        typeorm_1.Column(),
+        __metadata("design:type", String)
+    ], viewProducts.prototype, "Estado", void 0);
+    __decorate([
+        typeorm_1.Column(),
+        __metadata("design:type", String)
+    ], viewProducts.prototype, "Precio", void 0);
+    __decorate([
+        typeorm_1.Column(),
+        __metadata("design:type", String)
+    ], viewProducts.prototype, "PrecioRebajado", void 0);
+    __decorate([
+        typeorm_1.Column(),
+        __metadata("design:type", String)
+    ], viewProducts.prototype, "PCoste", void 0);
+    __decorate([
+        typeorm_1.Column(),
+        __metadata("design:type", String)
+    ], viewProducts.prototype, "Stock", void 0);
+    __decorate([
+        typeorm_1.Column(),
+        __metadata("design:type", String)
     ], viewProducts.prototype, "Sku", void 0);
+    __decorate([
+        typeorm_1.Column(),
+        __metadata("design:type", String)
+    ], viewProducts.prototype, "IVA", void 0);
+    __decorate([
+        typeorm_1.Column(),
+        __metadata("design:type", String)
+    ], viewProducts.prototype, "PorcIVA", void 0);
+    __decorate([
+        typeorm_1.Column(),
+        __metadata("design:type", String)
+    ], viewProducts.prototype, "refproveedor", void 0);
     __decorate([
         typeorm_1.Column(),
         __metadata("design:type", String)
@@ -42,6 +86,18 @@ var viewProducts = /** @class */ (function () {
         typeorm_1.Column(),
         __metadata("design:type", String)
     ], viewProducts.prototype, "Subcategoria", void 0);
+    __decorate([
+        typeorm_1.Column(),
+        __metadata("design:type", String)
+    ], viewProducts.prototype, "IdProveedor", void 0);
+    __decorate([
+        typeorm_1.Column(),
+        __metadata("design:type", String)
+    ], viewProducts.prototype, "IdCategoria", void 0);
+    __decorate([
+        typeorm_1.Column(),
+        __metadata("design:type", String)
+    ], viewProducts.prototype, "IdSubCategoria", void 0);
     viewProducts = __decorate([
         typeorm_1.Entity()
     ], viewProducts);

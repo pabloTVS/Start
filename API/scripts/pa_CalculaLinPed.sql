@@ -1,56 +1,120 @@
-CREATE DEFINER=`startden_dekorativa`@`213.181.68.23` PROCEDURE `pa_CalculaLinPed`( in pedido int, in linea int)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `pa_CalculaLinPed`( in pedido int, in linea int)
 BEGIN
-    SELECT IFNULL(Serie,'A') INTO @serie FROM pedidos WHERE NumPed=pedido;
+SELECT IFNULL(Serie,'A') INTO @serie FROM orders WHERE NumPed=pedido;
+SELECT IFNULL(CodFormaPago,1) INTO @formaPago FROM orders WHERE NumPed=pedido;
+SELECT IFNULL(RE,0) INTO @recli FROM customers WHERE IdCliente in (SELECT CodCli FROM orders WHERE NumPed=pedido);
+
 SELECT 
     IFNULL(Cantidad, 0)
 INTO @cantidad FROM
-    linPed
-WHERE
-    NumPed = pedido AND IdLinPed = linea;
-	SELECT 
+    linorders
+WHERE   NumPed = pedido AND IdLinPed = linea;
+
+SELECT 
     IFNULL(Precio, 0)
 INTO @precio FROM
-    linPed
+    linorders
 WHERE
     NumPed = pedido AND IdLinPed = linea;
-	SELECT 
+    
+SELECT 
     IFNULL(DtoC, 0)
 INTO @dtoC FROM
-    linPed
+    linorders
 WHERE
     NumPed = pedido AND IdLinPed = linea;
-	SELECT 
+
+SELECT 
+    IFNULL(DtoPP, 0)
+INTO @dtoPP FROM
+    linorders
+WHERE
+    NumPed = pedido AND IdLinPed = linea;
+
+
+SELECT 
     IFNULL(IVA, 0)
 INTO @IVA FROM
-    linPed
+    linorders
 WHERE
     NumPed = pedido AND IdLinPed = linea;
-	SELECT 
-    IFNULL(RE, 0)
-INTO @RE FROM
-    linPed
-WHERE
-    NumPed = pedido AND IdLinPed = linea;
-	
+
+IF (@recli = 1) THEN
+    IF (@IVA = 21) THEN
+        SET @RE = 5.20; 
+    ELSEIF (@IVA = 10) THEN
+            SET @RE = 1.40;
+         ELSE SET @RE = 0;
+    END IF;
+ELSE SET @RE = 0;
+END IF;
+
 						
-	SET @subTotal = CONVERT(@cantidad * @precio,DECIMAL(18,5));
-	SET @importeDtoC = CONVERT(@subTotal*(@dtoC/100),DECIMAL(18,5));
-	SET @subTotal = @subTotal - @importeDtoC;
-	SET @totalBase = CONVERT(@subTotal,DECIMAL(18,5));
-	SET @importeIVA = CONVERT(@totalBase*(@IVA/100),DECIMAL(18,5));
-	SET @importeRE = CONVERT(@totalBase*(@RE/100),DECIMAL(18,5));
-	SET @total = @totalBase + @importeIVA + @importeRE;
+	SET @subTotal = IFNULL(CONVERT(@cantidad * @precio,DECIMAL(18,5)),0);
+	SET @importeDtoC = IFNULL(CONVERT(@subTotal*(@dtoC/100),DECIMAL(18,5)),0);
+	SET @totalBase = IFNULL(CONVERT(@subTotal - @importeDtoC,DECIMAL(18,5)),0);
+    SET @importeDtoPP = IFNULL(CONVERT(@totalBase*(@dtoPP/100),DECIMAL(18,5)),0);
+    SET @baseImponible = IFNULL(CONVERT(@totalBase - @importeDtoPP,DECIMAL(18,5)),0);
+	SET @importeIVA = IFNULL(CONVERT(@baseImponible*(@IVA/100),DECIMAL(18,5)),0);
+	SET @importeRE = IFNULL(CONVERT(@baseImponible*(@RE/100),DECIMAL(18,5)),0);
+	SET @total = IFNULL(@baseImponible + @importeIVA + @importeRE,0);
 	
 	
-	UPDATE linPed 
+	UPDATE linorders
 SET 
-    SubTotal = @subTotal,
+    SubTotal = @totalBase,
     ImporteDtoC = @importeDtoC,
-    BaseImponible = @totalBase,
+    ImporteDtoPP = @importeDtoPP,
+    BaseImponible = @baseImponible,
     ImporteIVA = @importeIVA,
     ImporteRE = @importeRE,
-    Total = @total
+    Total = @total,
+    RE = @RE
 WHERE
     NumPed = pedido AND IdlinPed = linea;
+
+IF (@formaPago = 3) THEN
+BEGIN
+	SELECT IFNULL(PContraReembolso,0),IFNULL(MinimoContraReembolso,0) INTO @Porc,@min FROM payments where IdFormaPago = 3; /*contrarrembolso*/
+	
+    SELECT IFNULL(SUM(BaseImponible),0) INTO @bi FROM linorders WHERE NumPed = pedido AND CodArticulo != '9999999';
+    
+    SET @Contra = (IFNULL(@bi,0)*(@Porc/100));
+    
+    IF (@Contra < @min) THEN 
+    	SET @Contra = @min; 
+    END IF;
+    
+   	SET @IVA = 21;
+    
+    IF (@recli = 1) THEN
+        SET @RE = 5.20; 
+    ELSE
+    	SET @RE = 0; 
+    END IF;    
+    
+    
+    IF (SELECT 1 = 1 FROM linorders WHERE NumPed=pedido AND CodArticulo='9999999') THEN
+    BEGIN
+    	UPDATE linorders SET BaseImponible = @Contra,
+        IVA = @IVA, 
+        RE = @RE,
+        ImporteIVA = IFNULL(CONVERT(@Contra*(@IVA/100),DECIMAL(18,5)),0),
+        ImporteRE = IFNULL(CONVERT(@Contra*(@RE/100),DECIMAL(18,5)),0), 
+        Total = @Contra + IFNULL(CONVERT(@Contra*(@IVA/100),DECIMAL(18,5)),0) + IFNULL(CONVERT(@Contra*(@RE/100),DECIMAL(18,5)),0)
+        WHERE NumPed = pedido AND CodArticulo = '9999999';
+        
+    END;
+    ELSE
+    BEGIN
+    	SET @ImpIVA = IFNULL(CONVERT(@Contra*(@IVA/100),DECIMAL(18,5)),0);
+        SET @ImpREC = IFNULL(CONVERT(@Contra*(@RE/100),DECIMAL(18,5)),0);
+        INSERT INTO linorders (NumPed,CodArticulo,Descripcion,Cantidad,BaseImponible,IVA,ImporteIVA,RE,ImporteRE,Total) 
+        VALUES(pedido,'9999999','Gastos contrareembolso',1,@Contra,@IVA,@ImpIVA,@RE,@ImpREC,@Contra+@ImpIVA+@ImpREC);
+        /*SELECT LAST_INSERT_ID() AS TableID;*/
+    END;
+    END IF;
+END;
+END IF;
 
 END
