@@ -54,12 +54,20 @@ export class PedidosComponent implements OnInit {
   displayedColumns: string[] = ['Imagen','Articulo', 'Sku', 'refproveedor','Precio','PrecioRebajado','actions'];
   dataSource = new MatTableDataSource();
 
-  displayedColumnsOrder: string[] = ['CodArticulo', 'Descripcion','Cantidad','Precio','IVA','DtoC','DtoPP'];
+  displayedColumnsOrder: string[] = ['CodArticulo', 'Descripcion','Cantidad','Precio','IVA','DtoC','DtoPP','actions'];
   dataSourceOrder = new MatTableDataSource();
 
 //  displayedColumnViewlines: string[] =['CodArticulo', 'Descripcion','Cantidad','Precio','DtoC','SubTotal','DtoPP','BaseImponible','IVA','ImporteIVA','RE','ImporteRE','Total']
   displayedColumnViewlines: string[] =['Imagen','CodArticulo', 'Descripcion','Cantidad','Precio','DtoC','SubTotal','DtoPP','BaseImponible','IVA','RE','Total']
   dataSourceViewlines = new MatTableDataSource();
+
+  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+
+  ngAfterViewInit() {
+    this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
+  }
 
   headForm = this.fb.group({
     Serie: ['A',[Validators.required]],
@@ -110,8 +118,7 @@ export class PedidosComponent implements OnInit {
   });
 
 
-  @ViewChild(MatSort) sort: MatSort;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+
   
   typeVat: typesOfVat[] = 
   [
@@ -242,11 +249,6 @@ export class PedidosComponent implements OnInit {
       this.dataSource.data.length >0 ? this.spinnerSvc.hide() : this.spinnerSvc.show();
   }
 
-  ngAfterViewInit() {
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
-  }
-
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
@@ -343,6 +345,20 @@ export class PedidosComponent implements OnInit {
     } catch (error) {
       console.log('Error creando pedido.')
     }
-
   }
+
+  onDeleteLine(orderId:any):void {
+    console.log(orderId);
+    
+    if (window.confirm('¿Estás seguro de borrar esta línea el pedido?.'))
+    {
+      try {
+        console.log(orderId);
+          //this.svcLinOrd.delete(orderId).subscribe(lin => window.alert('línea borrada.'));
+      } catch (error) {
+        console.log('Error borrando línea de pedido.')
+      }
+    }
+  }
+
 }
