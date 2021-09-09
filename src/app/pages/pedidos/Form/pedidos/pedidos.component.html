@@ -378,8 +378,8 @@
             <mat-card-footer>
             <mat-card-subtitle>Líneas añadidas al pedido.</mat-card-subtitle>
             <ng-container >
-             <table mat-table [dataSource]="dataSourceOrder" class="mat-elevation-z8">
-            <!--  <table mat-table [dataSource]="(linOrder$ | async)" class="mat-elevation-z8">-->
+            <!-- <table mat-table [dataSource]="dataSourceOrder" class="mat-elevation-z8"> -->
+              <table mat-table [dataSource]="(linOrder$ | async)" class="mat-elevation-z8">
                 <ng-container matColumnDef="CodArticulo">
                   <th mat-header-cell *matHeaderCellDef> Articulo </th>
                   <td mat-cell *matCellDef="let element"> {{element.CodArticulo}} </td>

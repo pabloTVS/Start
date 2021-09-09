@@ -364,7 +364,8 @@ export class PedidosComponent implements OnInit {
 
   onUpdateLines ():void{
     try {
-      this.svcLinOrd.getLinOrder(this.orderId).subscribe(lines => this.dataSourceOrder.data = lines)
+      this.linOrder$ = this.svcLinOrd.getLinOrder(this.orderId);
+      //this.svcLinOrd.getLinOrder(this.orderId).subscribe(lines => this.dataSourceOrder.data = lines)
     } catch (e) {
       console.log('Error obteniendo líneas');
 
