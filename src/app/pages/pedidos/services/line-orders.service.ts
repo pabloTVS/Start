@@ -23,11 +23,11 @@ export class LineOrdersService {
     return this.http
       .post<LinesOrders>(`${environment.API_URL}/ordlines`, Lines)
       .pipe(catchError(this.handlerError));
-  }  
+  }
 
-  delete(orderId: number): Observable<{}> {
+  delete(IdLinPed:number,NumPedido: number): Observable<{}> {
     return this.http
-      .delete<LinesOrders>(`${environment.API_URL}/ordlines/${orderId}`)
+      .delete<LinesOrders>(`${environment.API_URL}/ordlines/${IdLinPed}/${NumPedido}`)
       .pipe(catchError(this.handlerError));
   }
 
@@ -39,5 +39,5 @@ export class LineOrdersService {
     }
     window.alert(errorMessage);
     return throwError(errorMessage);
-  }  
+  }
 }

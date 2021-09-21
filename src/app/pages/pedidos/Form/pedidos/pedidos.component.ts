@@ -119,8 +119,8 @@ export class PedidosComponent implements OnInit {
 
 
 
-  
-  typeVat: typesOfVat[] = 
+
+  typeVat: typesOfVat[] =
   [
     {value: 21, viewValue: '21%'},
     {value: 10, viewValue: '10%'},
@@ -226,7 +226,7 @@ export class PedidosComponent implements OnInit {
         this.viewmode = false;
         this.spinner();
         if (!this.codCli)
-          this.svcCustomer.getAll(this.codCom,this.role).subscribe(cust => 
+          this.svcCustomer.getAll(this.codCom,this.role).subscribe(cust =>
             {this.customer = cust;});
         else
           this.selectedCodCli = this.codCli;
@@ -330,8 +330,10 @@ export class PedidosComponent implements OnInit {
  //   console.log('añade un articulo',this.artForm.value);
     try {
       this.svcLinOrd.new(this.artForm.value).subscribe( line => {
-        this.lineOrder.push(line);
-        this.dataSourceOrder.data = this.lineOrder;
+
+        this.onUpdateLines();
+        //this.lineOrder.push(line);
+       // this.dataSourceOrder.data = this.lineOrder;
       });
       this.artForm.reset({
         NumPed: this.orderId,
@@ -347,17 +349,27 @@ export class PedidosComponent implements OnInit {
     }
   }
 
-  onDeleteLine(orderId:any):void {
-    console.log(orderId);
-    
+  onDeleteLine(item:any):void {
     if (window.confirm('¿Estás seguro de borrar esta línea el pedido?.'))
     {
       try {
-        console.log(orderId);
-          //this.svcLinOrd.delete(orderId).subscribe(lin => window.alert('línea borrada.'));
+          this.svcLinOrd.delete(item.IdLinPed,item.NumPed).subscribe(del => this.onUpdateLines());
+          console.log('Línea borrada.');
+
       } catch (error) {
         console.log('Error borrando línea de pedido.')
       }
+    }
+  }
+
+  onUpdateLines ():void{
+    try {
+      this.linOrder$ = this.svcLinOrd.getLinOrder(this.orderId);
+      //this.svcLinOrd.getLinOrder(this.orderId).subscribe(lines => this.dataSourceOrder.data = lines)
+    } catch (e) {
+      console.log('Error obteniendo líneas');
+
+
     }
   }
 
