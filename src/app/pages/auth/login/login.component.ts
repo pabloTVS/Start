@@ -4,6 +4,9 @@ import { Router } from '@angular/router';
 import { BaseFormUser } from '@shared/utils/base-form-user';
 import { AuthService } from '@auth/auth.service';
 import { Subscription } from 'rxjs';
+
+import { WpAuthService } from '@shared/services/wp-auth.service';
+import { UserResponseWP} from '@shared/models/userWP.interface';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -12,9 +15,11 @@ import { Subscription } from 'rxjs';
 export class LoginComponent implements OnInit, OnDestroy {
   hide = true;
   private subscription: Subscription = new Subscription();
+  token = null;
 
   constructor(
     private authSvc: AuthService,
+    private wp: WpAuthService,
     private router: Router,
     public loginForm: BaseFormUser
   ) {}
@@ -40,7 +45,11 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.authSvc.login(formValue).subscribe((res) => {
         if (res) {
           this.router.navigate(['']);
+          //me conecto a la api de wp y almaceno el token.          
+          this.wp.loginJWTwp().subscribe();
+  
         }
+
       })
     );
   }
